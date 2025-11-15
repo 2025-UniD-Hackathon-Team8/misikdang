@@ -65,7 +65,7 @@ export const useImageColor = (imageUrl: string) => {
 
           // 밝기 계산 (0-255, 128 기준으로 어두운지 밝은지 판단)
           const luminance = getLuminance(adjustedR, adjustedG, adjustedB);
-          const isDark = luminance < 128;
+          const isDark = luminance < 160;
 
           setColor(hexColor);
           setTextColor(isDark ? colors.secondary : colors.primary);

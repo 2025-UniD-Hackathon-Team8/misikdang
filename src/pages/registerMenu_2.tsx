@@ -1,15 +1,29 @@
 // src/registerMenu_2.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import Button from "../components/Button.tsx"; 
-import Header from "../components/Header.tsx"; 
+import TopNavigator from "../components/TopNavigator.tsx"; 
 //import TabBar from "./components/TabBar"; 
 import { colors } from "../constants/colors.ts"; 
+import { getMenuData, saveMenuData, validateStep2 } from "../utils/menuDataManager.ts";
 
 const discountOptions = ["10%", "20%", "30%", "무료"];
 
 export default function RegisterMenu1() {
   const [selectedDiscount, setSelectedDiscount] = useState<string>("무료");
+  const [menuName, setMenuName] = useState<string>("");
+  const [menuPrice, setMenuPrice] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Load existing data on mount
+  useEffect(() => {
+    const savedData = getMenuData();
+    setMenuName(savedData.menuName);
+    setMenuPrice(savedData.menuPrice);
+    setSelectedDiscount(savedData.discount);
+    setDescription(savedData.description);
+  }, []);
 
   const handleBack = async () => {
     try {
@@ -28,6 +42,23 @@ export default function RegisterMenu1() {
     }
   };
   const handleNext = async () => {
+    // Validate step 2 data
+    const validation = validateStep2(menuName, menuPrice, selectedDiscount, description);
+    if (!validation.valid) {
+      setValidationError(validation.error);
+      return;
+    }
+
+    // Save menu data before moving to next page
+    const currentData = getMenuData();
+    saveMenuData({
+      ...currentData,
+      menuName,
+      menuPrice,
+      discount: selectedDiscount,
+      description,
+    });
+
     try {
       const mod = await import("./RegisterMenu_3");
       const Page = mod && mod.default ? mod.default : null;
@@ -47,7 +78,7 @@ export default function RegisterMenu1() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {/* 1. 헤더 */}
-  <Header title="메뉴 등록" onBackClick={handleBack} />
+  <TopNavigator title="메뉴 등록" onBackClick={handleBack} />
 
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
@@ -58,6 +89,13 @@ export default function RegisterMenu1() {
       </div>
       {/* 3. 메인 컨텐츠  */}
       <div className="flex flex-grow flex-col p-4">
+        {/* Error message display */}
+        {validationError && (
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
+            <p className="text-sm font-medium text-red-800">{validationError}</p>
+          </div>
+        )}
+
         {/* 3-1. 메뉴정보 입력 폼*/}
         <form className="relative mb-4 w-full">
           <div>
@@ -70,6 +108,8 @@ export default function RegisterMenu1() {
             <input
               id="menuName"
               type="text"
+              value={menuName}
+              onChange={(e) => setMenuName(e.target.value)}
               placeholder="예) 아메리카노"
               className="w-full rounded-lg border border-gray-300 py-3 px-4 text-base focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
             />
@@ -88,6 +128,8 @@ export default function RegisterMenu1() {
                 <input
                   id="menuPrice"
                   type="text"
+                  value={menuPrice}
+                  onChange={(e) => setMenuPrice(e.target.value)}
                   placeholder="예) 4500"
                   className="w-full rounded-lg border border-gray-300 py-3 pl-4 pr-10 text-base focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
                 />
@@ -147,6 +189,8 @@ export default function RegisterMenu1() {
             </label>
             <textarea
               id="des"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="메뉴에 대한 상세 정보를 입력하세요"
               className="w-full h-60 rounded-lg border border-gray-300 py-3 pl-4 pr-4 text-base focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
             />

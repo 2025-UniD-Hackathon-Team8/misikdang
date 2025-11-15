@@ -1,16 +1,27 @@
 // src/registerMenu_3.tsx
-import { useState, useRef, type ChangeEvent } from "react"; 
+import { useState, useRef, type ChangeEvent, useEffect } from "react"; 
 import Button from "../components/Button.tsx"; 
-import Header from "../components/Header.tsx"; 
+import TopNavigator from "../components/TopNavigator.tsx"; 
 import { createRoot } from "react-dom/client";
 //import TabBar from "./components/TabBar"; 
 import { colors } from "../constants/colors.ts"; 
+import { getMenuData, saveMenuData, validateStep3, downloadMenuDataAsJSON, clearMenuData } from "../utils/menuDataManager.ts";
 
 export default function RegisterMenu_3() {
   // 1. 이미지 미리보기 URL을 저장할 state
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState<string>("");
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // 2. 숨겨진 file input에 접근하기 위한 ref
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load existing data on mount
+  useEffect(() => {
+    const savedData = getMenuData();
+    setImagePreview(savedData.imagePreview);
+    setQuantity(savedData.quantity);
+  }, []);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; // 선택된 파일
@@ -59,10 +70,50 @@ export default function RegisterMenu_3() {
         window.history.back();
       }
     };
+
+  const handleComplete = async () => {
+    // Validate step 3 data
+    const validation = validateStep3(imagePreview, quantity);
+    if (!validation.valid) {
+      setValidationError(validation.error);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Save image preview and quantity to complete the data
+      const currentData = getMenuData();
+      const completeData = {
+        ...currentData,
+        imagePreview,
+        quantity,
+      };
+
+      // Save to localStorage
+      saveMenuData(completeData);
+
+      // Download as JSON file
+      downloadMenuDataAsJSON(completeData);
+
+      // Clear the data after successful submission
+      clearMenuData();
+
+      // Show success message
+      alert("메뉴 등록이 완료되었습니다!\\nJSON 파일이 다운로드되었습니다.");
+
+      // Navigate back to home
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Failed to complete registration:", error);
+      setValidationError("등록 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {/* 1. 헤더 */}
-      <Header title="이미지 등록" onBackClick={handleBack} />
+      <TopNavigator title="이미지 등록" onBackClick={handleBack} />
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
         <div className="flex h-1.5 w-full rounded-full bg-gray-200">
@@ -72,6 +123,13 @@ export default function RegisterMenu_3() {
 
       {/* 3. 메인 컨텐츠*/}
       <div className="flex flex-grow flex-col p-4">
+        {/* Error message display */}
+        {validationError && (
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
+            <p className="text-sm font-medium text-red-800">{validationError}</p>
+          </div>
+        )}
+
         {/* 3-1. 사진업로드*/}
         <form className="relative mb-4 w-full">
           <div>
@@ -132,6 +190,8 @@ export default function RegisterMenu_3() {
                 <input
                   id="menuQuantity"
                   type="text"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
                   placeholder="예) 10"
                   className="w-full rounded-lg border border-gray-300 py-3 pl-4 pr-10 text-base focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
                 />
@@ -142,11 +202,13 @@ export default function RegisterMenu_3() {
         {/* 3-2. 다음 버튼 */}
         <div className="mt-4 w-full">
           <Button
+            onClick={handleComplete}
+            disabled={isSubmitting}
             bgColor={colors.primary}
             fgColor={colors.secondary}
-            className="w-full border border-gray-400 py-3 text-base font-semibold hover:bg-gray-100"
+            className="w-full border border-gray-400 py-3 text-base font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            완료
+            {isSubmitting ? "처리 중..." : "완료"}
           </Button>
         </div>
       </div>

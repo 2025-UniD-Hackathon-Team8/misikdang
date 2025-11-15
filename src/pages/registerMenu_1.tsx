@@ -1,11 +1,12 @@
 // src/registerMenu_1.tsx
 import { createRoot } from "react-dom/client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react"; 
 import Button from "../components/Button.tsx"; 
-import Header from "../components/Header.tsx"; 
+import TopNavigator from "../components/TopNavigator.tsx"; 
 //import TabBar from "./components/TabBar"; 
 import { colors } from "../constants/colors.ts"; 
+import { getMenuData, saveMenuData, validateStep1 } from "../utils/menuDataManager.ts";
 
 
 export default function RegisterMenu1() {
@@ -13,6 +14,15 @@ export default function RegisterMenu1() {
   const [location, setLocation] = useState<{ lat: number; lng: number; formatted?: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Load existing data on mount
+  useEffect(() => {
+    const savedData = getMenuData();
+    if (savedData.location) {
+      setLocation(savedData.location);
+    }
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +75,20 @@ export default function RegisterMenu1() {
   };
 
   const handleNext = async () => {
+    // Validate location data
+    const validation = validateStep1(location);
+    if (!validation.valid) {
+      setValidationError(validation.error);
+      return;
+    }
+
+    // Save location data before moving to next page
+    const currentData = getMenuData();
+    saveMenuData({
+      ...currentData,
+      location: location!,
+    });
+
     try {
       const mod = await import("./registerMenu_2");
       const Page = mod && mod.default ? mod.default : null;
@@ -83,7 +107,7 @@ export default function RegisterMenu1() {
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {/* 1. 헤더 */}
-      <Header title="위치 등록" onBackClick={() => window.history.back()} />
+      <TopNavigator title="위치 등록" onBackClick={() => window.history.back()} />
 
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
@@ -95,6 +119,13 @@ export default function RegisterMenu1() {
 
       {/* 3. 메인 컨텐츠 (지도 및 버튼) */}
       <div className="flex flex-grow flex-col p-4">
+        {/* Error message display */}
+        {validationError && (
+          <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
+            <p className="text-sm font-medium text-red-800">{validationError}</p>
+          </div>
+        )}
+
         {/* 3-1. 지번, 도로명 검색 폼 */}
         <form onSubmit={handleSearch} className="relative mb-4 w-full">
           <input
@@ -149,9 +180,10 @@ export default function RegisterMenu1() {
         <div className="mt-4 w-full">
           <Button
             onClick={handleNext}
+            disabled={loading}
             bgColor={colors.secondary}
             fgColor={colors.primary}
-            className="w-full border border-gray-400 py-3 text-base font-semibold hover:bg-gray-50"
+            className="w-full border border-gray-400 py-3 text-base font-semibold hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             다음
           </Button>
