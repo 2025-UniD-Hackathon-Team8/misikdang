@@ -7,7 +7,8 @@ const STORAGE_KEYS = {
   GOURMET_PROFILE: "misikdang_gourmet_profile",
   OWNER_PROFILE: "misikdang_owner_profile",
   CATEGORY_CANDIDATES: "misikdang_category_candidates", // owner가 올린 메뉴별 테스트 후보 (gourmet가 오른쪽 스와이프한 사용자들)
-  GOURMET_REQUESTS: "misikdang_gourmet_requests", // gourmet가 받은 요청 목록 (owner가 보낸 요청도 포함)
+  GOURMET_CONV: "misikdang_gourmet_conv", // gourmet의 요청 목록 (sent: 내가 보낸, received: 받은)
+  OWNER_CONV: "misikdang_owner_conv", // owner의 요청 목록 (sent: 내가 보낸, received: 받은)
 } as const;
 
 // 제네릭 localStorage 저장 함수
@@ -176,11 +177,20 @@ export function getCandidatesByCategory(categoryName: string) {
 
 // Gourmet 요청 관리 함수들
 export function getGourmetRequests() {
-  return getLocalStorage(STORAGE_KEYS.GOURMET_REQUESTS, []);
+  return getLocalStorage(STORAGE_KEYS.GOURMET_CONV, []);
 }
 
 export function setGourmetRequests(requests: any[]) {
-  setLocalStorage(STORAGE_KEYS.GOURMET_REQUESTS, requests);
+  setLocalStorage(STORAGE_KEYS.GOURMET_CONV, requests);
+}
+
+// Owner 요청 관리 함수들
+export function getOwnerConversations() {
+  return getLocalStorage(STORAGE_KEYS.OWNER_CONV, []);
+}
+
+export function setOwnerConversations(requests: any[]) {
+  setLocalStorage(STORAGE_KEYS.OWNER_CONV, requests);
 }
 
 // Owner가 gourmet에게 요청 보내기
@@ -194,9 +204,12 @@ export function sendRequestToGourmet(
     distance?: string;
   }
 ) {
-  const gourmetRequests = getGourmetRequests();
-  const newRequest = {
-    id: `request-${Date.now()}`,
+  const requestId = `request-${Date.now()}`;
+
+  // Owner CONV에 sent로 저장
+  const ownerConv = getOwnerConversations();
+  const ownerRequest = {
+    id: requestId,
     type: "sent" as const,
     title: gourmetNickname,
     subtitle: menuName,
@@ -206,9 +219,24 @@ export function sendRequestToGourmet(
     menuName,
     timestamp: new Date().toISOString(),
   };
-  setGourmetRequests([...gourmetRequests, newRequest]);
+  setOwnerConversations([...ownerConv, ownerRequest]);
 
-  return newRequest;
+  // Gourmet CONV에 received로 저장
+  const gourmetConv = getGourmetRequests();
+  const gourmetRequest = {
+    id: requestId,
+    type: "received" as const,
+    title: menuName,
+    subtitle: ownerInfo.name,
+    thumbnail: ownerRequest.thumbnail,
+    gourmetNickname,
+    ownerName: ownerInfo.name,
+    menuName,
+    timestamp: new Date().toISOString(),
+  };
+  setGourmetRequests([...gourmetConv, gourmetRequest]);
+
+  return ownerRequest;
 }
 
 // Gourmet 요청 삭제
@@ -218,10 +246,67 @@ export function removeGourmetRequest(requestId: string) {
   setGourmetRequests(updatedRequests);
 }
 
+// Owner 요청 삭제
+export function removeOwnerRequest(requestId: string) {
+  const requests = getOwnerConversations();
+  const updatedRequests = requests.filter((r: any) => r.id !== requestId);
+  setOwnerConversations(updatedRequests);
+}
+
+// Gourmet가 owner에게 요청 보내기 (미식 신청하기)
+export function sendGourmetRequest(
+  menuName: string,
+  gourmetInfo: {
+    name: string;
+    temperature?: number;
+  },
+  ownerName?: string
+) {
+  const requestId = `request-${Date.now()}`;
+
+  // Gourmet CONV에 sent로 저장
+  const gourmetConv = getGourmetRequests();
+  const gourmetRequest = {
+    id: requestId,
+    type: "sent" as const,
+    title: menuName,
+    subtitle: ownerName || "음식점",
+    thumbnail: getRandomColor(),
+    gourmetNickname: gourmetInfo.name,
+    ownerName: ownerName || "음식점",
+    menuName,
+    timestamp: new Date().toISOString(),
+  };
+  setGourmetRequests([...gourmetConv, gourmetRequest]);
+
+  // Owner CONV에 received로 저장
+  const ownerConv = getOwnerConversations();
+  const ownerRequest = {
+    id: requestId,
+    type: "received" as const,
+    title: gourmetInfo.name,
+    subtitle: menuName,
+    thumbnail: gourmetRequest.thumbnail,
+    gourmetNickname: gourmetInfo.name,
+    ownerName: ownerName || "음식점",
+    menuName,
+    timestamp: new Date().toISOString(),
+  };
+  setOwnerConversations([...ownerConv, ownerRequest]);
+
+  return gourmetRequest;
+}
+
 // Owner가 보낸 요청 목록 가져오기 (type === "sent")
 export function getOwnerRequests() {
-  const allRequests = getGourmetRequests();
+  const allRequests = getOwnerConversations();
   return allRequests.filter((r: any) => r.type === "sent");
+}
+
+// Owner가 받은 요청 목록 가져오기 (type === "received")
+export function getOwnerReceivedRequests() {
+  const allRequests = getOwnerConversations();
+  return allRequests.filter((r: any) => r.type === "received");
 }
 
 // 랜덤 색상 생성 (메뉴 썸네일용)

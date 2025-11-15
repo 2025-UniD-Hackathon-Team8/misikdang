@@ -3,7 +3,10 @@ import AcceptModal from "../components/AcceptModal";
 import RequestCardLarge from "../components/RequestCardLarge";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ToggleTabs from "../components/ToggleTabs";
-import { getGourmetRequests } from "../utils/localStorage";
+import {
+  getGourmetRequests,
+  removeGourmetRequest,
+} from "../utils/localStorage";
 
 const TABS = [
   { id: "sent", label: "내가 한 요청" },
@@ -46,6 +49,7 @@ export default function UserRequestHistoryPage() {
 
   const handleRemoveRequest = (requestId: string) => {
     setRequests((prev) => prev.filter((request) => request.id !== requestId));
+    removeGourmetRequest(requestId);
   };
 
   const handleAcceptRequest = (requestId: string) => {

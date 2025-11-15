@@ -23,14 +23,16 @@ const ProfileScreen: React.FC = () => {
     "pendingReview"
   );
 
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedNickname, setEditedNickname] = useState(nickname);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [modalData, setModalData] = useState<{
     review: ReviewItem;
     type: "pending" | "history";
   } | null>(null);
-
-  const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
 
   // 프로필 업데이트 함수 (필요시 사용)
   const updateProfile = (updates: Partial<ProfileData>) => {
@@ -48,7 +50,11 @@ const ProfileScreen: React.FC = () => {
   );
 
   const handleTabSelect = (id: string) => {
-    setActiveTab(id as "pendingReview" | "reviewHistory");
+    setIsAnimating(true);
+    setTimeout(() => {
+      setActiveTab(id as "pendingReview" | "reviewHistory");
+      setIsAnimating(false);
+    }, 150);
   };
 
   const handleCardClick = (review: ReviewItem, type: "pending" | "history") => {
@@ -60,6 +66,36 @@ const ProfileScreen: React.FC = () => {
     setIsModalOpen(false); // 모달 닫기
     setModalData(null); // 데이터 초기화
   };
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // 저장 로직
+      const updatedProfile = {
+        ...profileData,
+        nickname: editedNickname,
+      };
+      setOwnerProfile(updatedProfile);
+      alert("프로필이 저장되었습니다!");
+    } else {
+      // 편집 모드로 전환
+      setEditedNickname(nickname);
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const UserAvatarSVG = () => (
+    <svg
+      width="96"
+      height="96"
+      viewBox="0 0 96 96"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="48" cy="48" r="48" fill="#4A90E2" />
+      <circle cx="48" cy="38" r="14" fill="white" />
+      <path d="M24 78c0-13.255 10.745-24 24-24s24 10.745 24 24" fill="white" />
+    </svg>
+  );
 
   return (
     <div className="h-dvh bg-white">
@@ -75,21 +111,32 @@ const ProfileScreen: React.FC = () => {
           style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}
         >
           <div className="flex items-center mb-5 text-left">
-            <img
-              src={userAvatar}
-              alt="User Avatar"
-              className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover"
-            />
-            <div className="justify-center">
-              <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
+            <div className="mr-4">
+              <UserAvatarSVG />
+            </div>
+            <div className="justify-center flex-1">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedNickname}
+                  onChange={(e) => setEditedNickname(e.target.value)}
+                  className="text-2xl font-bold text-gray-900 border-b-2 border-gray-300 focus:border-orange-600 outline-none w-full px-1 py-1"
+                  placeholder="닉네임 입력"
+                />
+              ) : (
+                <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
+              )}
               <p className="text-sm text-gray-500 mt-1 ">{userId}</p>
               <p className="text-xs text-gray-500 mt-1">🗓️ {joinDate}</p>
             </div>
           </div>
 
-          <button className="w-full border border-gray-900 py-2.5 rounded-md text-center mb-8 hover:bg-gray-100 transition duration-150">
+          <button
+            onClick={handleEditToggle}
+            className="w-full border border-gray-900 py-2.5 rounded-md text-center mb-8 hover:bg-gray-100 transition duration-150"
+          >
             <span className="text-base font-semibold text-gray-900">
-              프로필 수정
+              {isEditing ? "저장" : "프로필 수정"}
             </span>
           </button>
 
@@ -105,7 +152,11 @@ const ProfileScreen: React.FC = () => {
 
         {/* 👇 수정된 부분: overflow-y-auto 영역에 px-5를 추가하여 리스트가 좌우 패딩을 갖도록 수정 */}
         <div
-          className="flex-1 overflow-y-auto"
+          className={`flex-1 overflow-y-auto transition-all duration-300 ${
+            isAnimating
+              ? "opacity-0 translate-y-2"
+              : "opacity-100 translate-y-0"
+          }`}
           style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
         >
           {activeTab === "reviewHistory" &&

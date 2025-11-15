@@ -3,7 +3,11 @@ import AcceptModal from "../components/AcceptModal";
 import RequestCardLarge from "../components/RequestCardLarge";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ToggleTabs from "../components/ToggleTabs";
-import { getOwnerRequests, removeGourmetRequest } from "../utils/localStorage";
+import {
+  getOwnerRequests,
+  getOwnerReceivedRequests,
+  removeOwnerRequest,
+} from "../utils/localStorage";
 
 const TABS = [
   { id: "sent", label: "내가 한 요청" },
@@ -24,6 +28,7 @@ const DEFAULT_TAB: TabId = "sent";
 
 export default function OwnerRequestHistoryPage() {
   const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [requests, setRequests] = useState<RequestItem[]>([]);
   const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(
     () => new Set()
@@ -32,8 +37,9 @@ export default function OwnerRequestHistoryPage() {
 
   // localStorage\uc5d0\uc11c \uc694\uccad \ubaa9\ub85d \ub85c\ub4dc
   useEffect(() => {
-    const storedRequests = getOwnerRequests();
-    setRequests(storedRequests);
+    const sentRequests = getOwnerRequests();
+    const receivedRequests = getOwnerReceivedRequests();
+    setRequests([...sentRequests, ...receivedRequests]);
   }, []);
 
   const visibleRequests = useMemo(
@@ -43,7 +49,7 @@ export default function OwnerRequestHistoryPage() {
 
   const handleRemoveRequest = (requestId: string) => {
     setRequests((prev) => prev.filter((request) => request.id !== requestId));
-    removeGourmetRequest(requestId);
+    removeOwnerRequest(requestId);
   };
 
   const handleAcceptRequest = (requestId: string) => {
@@ -53,6 +59,14 @@ export default function OwnerRequestHistoryPage() {
       return next;
     });
     setShowAcceptModal(true);
+  };
+
+  const handleTabChange = (tabId: string) => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setActiveTab(tabId as TabId);
+      setIsAnimating(false);
+    }, 150);
   };
 
   return (
@@ -66,10 +80,16 @@ export default function OwnerRequestHistoryPage() {
         <ToggleTabs
           tabs={TABS}
           activeTabId={activeTab}
-          onTabSelect={(id) => setActiveTab(id as TabId)}
+          onTabSelect={handleTabChange}
         />
 
-        <div className="flex flex-col items-center gap-[15px]">
+        <div
+          className={`flex flex-col items-center gap-[15px] transition-all duration-300 ${
+            isAnimating
+              ? "opacity-0 translate-y-2"
+              : "opacity-100 translate-y-0"
+          }`}
+        >
           {visibleRequests.map((request) => {
             const isReceived = request.type === "received";
             const isAccepted = acceptedRequests.has(request.id);

@@ -11,6 +11,7 @@ import {
   addCategoryCandidate,
   getGourmetProfile,
   incrementMenuCount,
+  sendGourmetRequest,
 } from "../utils/localStorage";
 
 export default function Home() {
@@ -73,9 +74,22 @@ export default function Home() {
     }
   };
 
+  const handleApply = () => {
+    const currentCard = allCards[currentIndex];
+    if (currentCard && currentCard.type === "item") {
+      const userProfile = getGourmetProfile();
+      if (userProfile) {
+        sendGourmetRequest(currentCard.title, {
+          name: userProfile.nickname,
+          temperature: userProfile.reviewTemperature,
+        });
+      }
+    }
+  };
+
   return (
     <div
-      className="w-full min-h-screen transition-all duration-700 ease-in-out"
+      className="w-full min-h-screen"
       style={{
         background: `linear-gradient(180deg, ${bgColor} 0%, ${bgColor} 20%, #fcfcfc 47%, #fcfcfc 100%)`,
       }}
@@ -138,6 +152,7 @@ export default function Home() {
                         fgColor={colors.secondary}
                         className="w-full py-2 text-base font-bold rounded-2xl"
                         discount={card.discount}
+                        onApply={handleApply}
                       >
                         미식 신청하기
                       </ApplyButton>
@@ -178,6 +193,7 @@ export default function Home() {
                         fgColor={colors.secondary}
                         className="w-full py-2 text-base font-bold rounded-2xl"
                         discount={currentCard.discount}
+                        onApply={handleApply}
                       >
                         미식 신청하기
                       </ApplyButton>
