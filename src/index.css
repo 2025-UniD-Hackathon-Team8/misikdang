@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.woff2")
+      format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JoseonPalace";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/ChosunGs.woff")
+    format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Tailwind Custom Colors */
   --color-primary: #000000;
@@ -8,7 +26,7 @@
   --color-gray-1: #666666;
   --color-gray-2: #aaaaaa;
 
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -18,6 +36,15 @@
 
 body {
   background-color: var(--color-gray-2);
+  font-family: "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.font-pretendard {
+  font-family: "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.font-joseon {
+  font-family: "JoseonPalace", "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 #root {
