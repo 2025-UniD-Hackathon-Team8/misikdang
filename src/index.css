@@ -17,6 +17,14 @@
 }
 
 body {
+  background-color: var(--color-gray-2);
+}
+
+#root {
+  width: 400px;
+  height: 100vh;
+  background-color: var(--color-background);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 button {
