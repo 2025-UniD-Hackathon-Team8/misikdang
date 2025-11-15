@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { color, motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
 import { colors } from "../constants";
+import { useState } from "react";
 
 interface Restaurant {
   name: string;
@@ -18,6 +19,7 @@ interface CategoryCardProps {
   restaurants: Restaurant[];
   children?: ReactNode;
   onSwipeRight?: () => void;
+  onSwipeLeft?: () => void;
   index?: number;
   totalCards?: number;
 }
@@ -29,21 +31,30 @@ export default function CategoryCard({
   restaurants,
   children,
   onSwipeRight,
+  onSwipeLeft,
   index = 0,
   totalCards = 1,
 }: CategoryCardProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
   const opacity = useTransform(x, [-200, 0, 200], [0.5, 1, 0.5]);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
+    setIsDragging(false);
     if (info.offset.x > 100) {
       onSwipeRight?.();
+    } else if (info.offset.x < -100) {
+      onSwipeLeft?.();
     }
   };
 
   const isBackground = index > 0;
-  const backgroundRotation = index === 1 ? -3 : index === 2 ? -4 : 0;
+  const backgroundRotation = index === 1 ? -3 : index === 2 ? 4 : 0;
   const zIndex = totalCards - index;
 
   return (
@@ -56,26 +67,35 @@ export default function CategoryCard({
         opacity: 1,
       }}
       animate={{
-        rotate: isBackground ? backgroundRotation : 0,
+        rotate: isBackground
+          ? backgroundRotation
+          : !isDragging
+          ? [0, -1.5, 1.5, -1.5, 1.5, 0]
+          : 0,
         opacity: 1,
       }}
       transition={{
-        duration: 0.5,
-        ease: "easeOut",
+        duration: isBackground ? 0.5 : 1.5,
+        ease: "easeInOut",
+        repeat: isBackground || isDragging ? 0 : Infinity,
+        repeatDelay: 4,
+        delay: isBackground ? 0 : 2,
       }}
       style={{
         x: !isBackground ? x : 0,
-        rotate: !isBackground ? rotate : undefined,
+        rotate: !isBackground ? rotate : backgroundRotation,
         opacity: !isBackground ? opacity : 1,
         zIndex,
         width: "320px",
         height: "600px",
         left: "50%",
         marginLeft: "-160px",
+        originY: 1,
       }}
       drag={!isBackground ? "x" : false}
       dragConstraints={!isBackground ? { left: 0, right: 0 } : undefined}
       dragElastic={!isBackground ? 0.7 : undefined}
+      onDragStart={!isBackground ? handleDragStart : undefined}
       onDragEnd={!isBackground ? handleDragEnd : undefined}
       whileTap={!isBackground ? { cursor: "grabbing" } : undefined}
     >
