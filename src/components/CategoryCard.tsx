@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { color, motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
 import { colors } from "../constants";
 import { useState } from "react";
@@ -65,16 +65,26 @@ export default function CategoryCard({
         opacity: 1,
       }}
       animate={{
+        // 드래그 중일 때는 rotate: 0 (흔들림 멈춤)
         rotate: isBackground ? backgroundRotation : !isDragging ? [0, -1.5, 1.5, -1.5, 1.5, 0] : 0,
         opacity: 1,
       }}
-      transition={{
-        duration: isBackground ? 0.5 : 1.5,
-        ease: "easeInOut",
-        repeat: isBackground || isDragging ? 0 : Infinity,
-        repeatDelay: 4,
-        delay: isBackground ? 0 : 2,
-      }}
+      // ⭐️ 수정: isDragging 상태에 따라 transition을 동적으로 변경하여 드래그 중 애니메이션 즉시 중단
+      transition={
+        !isDragging || isBackground
+          ? {
+              // 드래그 중이 아니거나 배경 카드일 때: 일반 또는 반복 애니메이션 설정
+              duration: isBackground ? 0.5 : 1.5,
+              ease: "easeInOut",
+              repeat: isBackground ? 0 : Infinity,
+              repeatDelay: 4,
+              delay: isBackground ? 0 : 2,
+            }
+          : {
+              // 드래그 중이면서 전면 카드일 때: 즉시 멈춤 (duration 0)
+              duration: 0,
+            }
+      }
       style={{
         x: !isBackground ? x : 0,
         rotate: !isBackground ? rotate : backgroundRotation,
@@ -98,7 +108,7 @@ export default function CategoryCard({
         <img src={imageUrl} alt={title} className="w-full h-full object-cover" loading="eager" style={{ pointerEvents: "none" }} />
       </div>
 
-      {/* Content */}
+      {/* Content (생략) */}
       <div className="px-4 py-3">
         {/* Title */}
         <h2 className="text-xl font-bold mb-1">{title}</h2>

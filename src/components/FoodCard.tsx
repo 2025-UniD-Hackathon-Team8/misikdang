@@ -71,13 +71,22 @@ export default function FoodCard({
         rotate: isBackground ? backgroundRotation : !isDragging ? [0, -1.5, 1.5, -1.5, 1.5, 0] : 0,
         opacity: 1,
       }}
-      transition={{
-        duration: isBackground ? 0.5 : 1.5,
-        ease: "easeInOut",
-        repeat: isBackground || isDragging ? 0 : Infinity,
-        repeatDelay: 4,
-        delay: isBackground ? 0 : 2,
-      }}
+      // ⭐️ 수정: isDragging 상태에 따라 transition을 동적으로 변경합니다.
+      transition={
+        !isDragging
+          ? {
+              // 드래그 중이 아닐 때: 흔들림 애니메이션 설정
+              duration: isBackground ? 0.5 : 1.5,
+              ease: "easeInOut",
+              repeat: isBackground ? 0 : Infinity, // isBackground가 아니면서 드래그 중이 아닐 때 무한 반복
+              repeatDelay: 4,
+              delay: isBackground ? 0 : 2,
+            }
+          : {
+              // 드래그 중일 때: 반복 애니메이션을 즉시 멈추기 위해 duration 0 설정
+              duration: 0,
+            }
+      }
       style={{
         x: !isBackground ? x : 0,
         rotate: !isBackground ? rotate : backgroundRotation,
@@ -92,8 +101,8 @@ export default function FoodCard({
       drag={!isBackground ? "x" : false}
       dragConstraints={!isBackground ? { left: 0, right: 0 } : undefined}
       dragElastic={!isBackground ? 0.7 : undefined}
-      onDragStart={!isBackground ? handleDragStart : undefined}
-      onDragEnd={!isBackground ? handleDragEnd : undefined}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       whileTap={!isBackground ? { cursor: "grabbing" } : undefined}
     >
       {/* Food Image */}
