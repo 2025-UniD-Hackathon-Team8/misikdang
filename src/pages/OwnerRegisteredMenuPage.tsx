@@ -131,6 +131,16 @@ export default function OwnerRegisteredMenuPage() {
 
   const handleAddMenu = async () => {
     try {
+      // 페이드 아웃 애니메이션 시작
+      const mainElement = document.querySelector("main");
+      if (mainElement) {
+        mainElement.style.transition = "opacity 0.3s ease-out";
+        mainElement.style.opacity = "0";
+      }
+
+      // 애니메이션 완료 후 페이지 전환
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const mod = await import("./registerMenu_1");
       const Page = mod && mod.default ? mod.default : null;
       const root = document.getElementById("root");
@@ -140,6 +150,12 @@ export default function OwnerRegisteredMenuPage() {
     } catch (error) {
       console.error("registerMenu_1 로 이동하지 못했습니다:", error);
       alert("메뉴 등록 화면으로 이동할 수 없어요. 잠시 후 다시 시도해주세요.");
+
+      // 에러 발생 시 원래 상태로 복원
+      const mainElement = document.querySelector("main");
+      if (mainElement) {
+        mainElement.style.opacity = "1";
+      }
     }
   };
 
