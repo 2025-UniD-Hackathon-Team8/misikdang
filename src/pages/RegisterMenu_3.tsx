@@ -1,9 +1,10 @@
 // src/registerMenu_3.tsx
-import { useState, useRef, type ChangeEvent } from "react"; // useRef, ChangeEvent 추가
-import Button from "../components/Button.tsx"; // 버튼 컴포넌트
-import Header from "../components/Header.tsx"; // 헤더 컴포넌트
-//import TabBar from "./components/TabBar"; // 탭바 컴포넌트
-import { colors } from "../constants/colors.ts"; // 색상 상수
+import { useState, useRef, type ChangeEvent } from "react"; 
+import Button from "../components/Button.tsx"; 
+import Header from "../components/Header.tsx"; 
+import { createRoot } from "react-dom/client";
+//import TabBar from "./components/TabBar"; 
+import { colors } from "../constants/colors.ts"; 
 
 export default function RegisterMenu_3() {
   // 1. 이미지 미리보기 URL을 저장할 state
@@ -42,12 +43,26 @@ export default function RegisterMenu_3() {
       fileInputRef.current.value = "";
     }
   };
-
+  const handleBack = async () => {
+      try {
+        const mod = await import("./registerMenu_1");
+        const Page = mod && mod.default ? mod.default : null;
+        const root = document.getElementById("root");
+        if (root && Page) {
+          createRoot(root).render(<Page />);
+        } else {
+          // fallback to history back if dynamic load fails
+          window.history.back();
+        }
+      } catch (e) {
+        console.error("Failed to navigate to registerMenu_1:", e);
+        window.history.back();
+      }
+    };
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {/* 1. 헤더 */}
-      <Header title="이미지 등록" onBackClick={() => window.history.back()} />
-
+      <Header title="이미지 등록" onBackClick={handleBack} />
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
         <div className="flex h-1.5 w-full rounded-full bg-gray-200">

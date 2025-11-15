@@ -1,18 +1,37 @@
 // src/registerMenu_2.tsx
 import { useState } from "react";
-import Button from "../components/Button.tsx"; // 버튼 컴포넌트
-import Header from "../components/Header.tsx"; // 헤더 컴포넌트
-//import TabBar from "./components/TabBar"; // 탭바 컴포넌트
-import { colors } from "../constants/colors.ts"; // 색상 상수
+import { createRoot } from "react-dom/client";
+import Button from "../components/Button.tsx"; 
+import Header from "../components/Header.tsx"; 
+//import TabBar from "./components/TabBar"; 
+import { colors } from "../constants/colors.ts"; 
 
 const discountOptions = ["10%", "20%", "30%", "무료"];
 
 export default function RegisterMenu1() {
   const [selectedDiscount, setSelectedDiscount] = useState<string>("무료");
+
+  const handleBack = async () => {
+    try {
+      const mod = await import("./registerMenu_1");
+      const Page = mod && mod.default ? mod.default : null;
+      const root = document.getElementById("root");
+      if (root && Page) {
+        createRoot(root).render(<Page />);
+      } else {
+        // fallback to history back if dynamic load fails
+        window.history.back();
+      }
+    } catch (e) {
+      console.error("Failed to navigate to registerMenu_1:", e);
+      window.history.back();
+    }
+  };
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {/* 1. 헤더 */}
-      <Header title="메뉴 등록" onBackClick={() => window.history.back()} />
+  <Header title="메뉴 등록" onBackClick={handleBack} />
 
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
