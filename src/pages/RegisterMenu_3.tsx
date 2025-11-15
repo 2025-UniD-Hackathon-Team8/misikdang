@@ -45,7 +45,7 @@ export default function RegisterMenu_3() {
   };
   const handleBack = async () => {
       try {
-        const mod = await import("./registerMenu_1");
+        const mod = await import("./registerMenu_2");
         const Page = mod && mod.default ? mod.default : null;
         const root = document.getElementById("root");
         if (root && Page) {
@@ -55,7 +55,7 @@ export default function RegisterMenu_3() {
           window.history.back();
         }
       } catch (e) {
-        console.error("Failed to navigate to registerMenu_1:", e);
+        console.error("Failed to navigate to registerMenu_2:", e);
         window.history.back();
       }
     };

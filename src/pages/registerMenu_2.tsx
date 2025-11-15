@@ -27,6 +27,22 @@ export default function RegisterMenu1() {
       window.history.back();
     }
   };
+  const handleNext = async () => {
+    try {
+      const mod = await import("./RegisterMenu_3");
+      const Page = mod && mod.default ? mod.default : null;
+      const root = document.getElementById("root");
+      if (root && Page) {
+        createRoot(root).render(<Page />);
+      } else {
+        // fallback: navigate forward using history or location
+        window.location.href = "/";
+      }
+    } catch (e) {
+      console.error("Failed to navigate to registerMenu_3:", e);
+      window.location.href = "/";
+    }
+  };
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
@@ -140,6 +156,7 @@ export default function RegisterMenu1() {
         {/* 3-2. 다음 버튼 */}
         <div className="mt-4 w-full">
           <Button
+            onClick={handleNext}
             bgColor={colors.secondary}
             fgColor={colors.primary}
             className="w-full border border-gray-400 py-3 text-base font-semibold hover:bg-gray-100" 
