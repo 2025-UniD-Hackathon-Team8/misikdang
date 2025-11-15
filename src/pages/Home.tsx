@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import FoodCard from "../components/FoodCard";
 import CategoryCard from "../components/CategoryCard";
 import ApplyButton from "../components/ApplyButton";
+import EndCard from "../components/EndCard";
 import { colors } from "../constants/colors";
 import { foodCategories, foodItems } from "../data/mockData";
 import { useImageColor } from "../hooks/useImageColor";
@@ -33,7 +34,13 @@ export default function Home() {
   }, [color, textColor]);
 
   const handleSwipeRight = () => {
-    if (currentIndex < allCards.length - 1) {
+    if (currentIndex < allCards.length) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handleSwipeLeft = () => {
+    if (currentIndex < allCards.length) {
       setCurrentIndex(currentIndex + 1);
     }
   };
@@ -106,7 +113,7 @@ export default function Home() {
         })}
 
         {/* 현재 카드 */}
-        {currentIndex < allCards.length &&
+        {currentIndex < allCards.length ? (
           (() => {
             const currentCard = allCards[currentIndex];
             if (currentCard.type === "category") {
@@ -115,6 +122,7 @@ export default function Home() {
                   key={`current-${currentIndex}`}
                   {...currentCard}
                   onSwipeRight={handleSwipeRight}
+                  onSwipeLeft={handleSwipeLeft}
                   index={0}
                   totalCards={3}
                 />
@@ -125,6 +133,7 @@ export default function Home() {
                   key={`current-${currentIndex}`}
                   {...currentCard}
                   onSwipeRight={handleSwipeRight}
+                  onSwipeLeft={handleSwipeLeft}
                   index={0}
                   totalCards={3}
                 >
@@ -139,7 +148,11 @@ export default function Home() {
                 </FoodCard>
               );
             }
-          })()}
+          })()
+        ) : (
+          /* 마지막 카드 */
+          <EndCard onReset={() => setCurrentIndex(0)} />
+        )}
       </div>
     </div>
   );

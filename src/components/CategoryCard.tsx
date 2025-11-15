@@ -18,6 +18,7 @@ interface CategoryCardProps {
   restaurants: Restaurant[];
   children?: ReactNode;
   onSwipeRight?: () => void;
+  onSwipeLeft?: () => void;
   index?: number;
   totalCards?: number;
 }
@@ -29,6 +30,7 @@ export default function CategoryCard({
   restaurants,
   children,
   onSwipeRight,
+  onSwipeLeft,
   index = 0,
   totalCards = 1,
 }: CategoryCardProps) {
@@ -39,6 +41,8 @@ export default function CategoryCard({
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.x > 100) {
       onSwipeRight?.();
+    } else if (info.offset.x < -100) {
+      onSwipeLeft?.();
     }
   };
 
