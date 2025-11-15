@@ -15,6 +15,7 @@ export default function RegisterMenu1() {
   const [menuPrice, setMenuPrice] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [currentProgress, setCurrentProgress] = useState(0);
 
   // Load existing data on mount
   useEffect(() => {
@@ -23,6 +24,14 @@ export default function RegisterMenu1() {
     setMenuPrice(savedData.menuPrice);
     setSelectedDiscount(savedData.discount);
     setDescription(savedData.description);
+  }, []);
+
+  // Progress bar animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentProgress(66.66);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleBack = async () => {
@@ -84,7 +93,10 @@ export default function RegisterMenu1() {
       <div className="w-full px-4 py-3">
         <div className="flex h-1.5 w-full rounded-full bg-gray-200">
           {/* 현재 단계 (2/3) */}
-          <div className="h-1.5 w-2/3 rounded-full bg-black"></div>
+          <div 
+            className="h-1.5 rounded-full bg-black transition-all duration-1000 ease-out" 
+            style={{ width: `${currentProgress}%` }}
+          ></div>
         </div>
       </div>
       {/* 3. 메인 컨텐츠  */}

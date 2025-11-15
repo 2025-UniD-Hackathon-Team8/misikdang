@@ -13,6 +13,7 @@ export default function RegisterMenu_3() {
   const [quantity, setQuantity] = useState<string>("");
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentProgress, setCurrentProgress] = useState(0);
   // 2. 숨겨진 file input에 접근하기 위한 ref
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,6 +22,14 @@ export default function RegisterMenu_3() {
     const savedData = getMenuData();
     setImagePreview(savedData.imagePreview);
     setQuantity(savedData.quantity);
+  }, []);
+
+  // Progress bar animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentProgress(100);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +108,7 @@ export default function RegisterMenu_3() {
       clearMenuData();
 
       // Show success message
-      alert("메뉴 등록이 완료되었습니다!\\nJSON 파일이 다운로드되었습니다.");
+      alert("메뉴 등록이 완료되었습니다!\\n");
 
       // Navigate back to home
       window.location.href = "/";
@@ -117,7 +126,10 @@ export default function RegisterMenu_3() {
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
         <div className="flex h-1.5 w-full rounded-full bg-gray-200">
-          <div className="h-1.5 w-full rounded-full bg-black"></div>
+          <div 
+            className="h-1.5 rounded-full bg-black transition-all duration-1000 ease-out" 
+            style={{ width: `${currentProgress}%` }}
+          ></div>
         </div>
       </div>
 
