@@ -18,6 +18,24 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "TmonMonsori";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/TmonMonsori.woff")
+    format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/Inter-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Tailwind Custom Colors */
   --color-primary: #000000;
@@ -45,6 +63,14 @@ body {
 
 .font-joseon {
   font-family: "JoseonPalace", "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.font-tmon {
+  font-family: "TmonMonsori", "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.font-inter {
+  font-family: "Inter", "Pretendard", system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 #root {
