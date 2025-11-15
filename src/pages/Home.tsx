@@ -1,14 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FoodCard from "../components/FoodCard";
 import CategoryCard from "../components/CategoryCard";
 import ApplyButton from "../components/ApplyButton";
 import { colors } from "../constants/colors";
 import { foodCategories, foodItems } from "../data/mockData";
+import { useImageColor } from "../hooks/useImageColor";
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [bgColor, setBgColor] = useState("#FFB682");
+  const [logoColor, setLogoColor] = useState("#000000");
 
   const allCards = [...foodCategories, ...foodItems];
+  const currentCard = allCards[currentIndex];
+  const { color, textColor } = useImageColor(currentCard?.imageUrl || "");
+
+  useEffect(() => {
+    if (color) {
+      setBgColor(color);
+    }
+    if (textColor) {
+      setLogoColor(textColor);
+    }
+  }, [color, textColor]);
 
   const handleSwipeRight = () => {
     if (currentIndex < allCards.length - 1) {
@@ -18,23 +32,26 @@ export default function Home() {
 
   return (
     <div
-      className="w-full min-h-screen"
+      className="w-full min-h-screen transition-all duration-700 ease-in-out"
       style={{
-        background:
-          "linear-gradient(180deg, #FFB682 0%, #FFB682 20%, #fcfcfc 47%, #fcfcfc 100%)",
+        background: `linear-gradient(180deg, ${bgColor} 0%, ${bgColor} 20%, #fcfcfc 47%, #fcfcfc 100%)`,
       }}
     >
       {/* Logo */}
       <div className="py-10 flex justify-center items-end">
         <div className="relative">
-          <span className="text-3xl font-bold" style={{ color: "#000000" }}>
+          <span
+            className="text-3xl font-bold transition-colors duration-700 ease-in-out"
+            style={{ color: logoColor }}
+          >
             美食堂
           </span>
           <span
-            className="absolute text-[10px] font-bold"
+            className="absolute text-[10px] font-bold transition-colors duration-700 ease-in-out"
             style={{
               bottom: "-12px",
               right: "0px",
+              color: logoColor,
             }}
           >
             미·식당
