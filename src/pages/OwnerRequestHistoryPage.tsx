@@ -20,6 +20,13 @@ type RequestItem = {
 
 const REQUESTS: RequestItem[] = [
   {
+    id: "sent-1",
+    type: "sent",
+    title: "고독한 미식가",
+    subtitle: "리뷰온도 50℃",
+    thumbnail: "#e3ddff",
+  },
+  {
     id: "received-1",
     type: "received",
     title: "모몽가모몽가",
@@ -40,24 +47,16 @@ const REQUESTS: RequestItem[] = [
     subtitle: "리뷰온도 50℃",
     thumbnail: "#cdf2ff",
   },
-  {
-    id: "sent-1",
-    type: "sent",
-    title: "고독한 미식가",
-    subtitle: "리뷰온도 50℃",
-    thumbnail: "#e3ddff",
-  },
 ] as const;
 
+const DEFAULT_TAB: TabId = "sent";
+
 export default function OwnerRequestHistoryPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("received");
+  const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
   const [requests, setRequests] = useState<RequestItem[]>(REQUESTS);
 
   const visibleRequests = useMemo(
-    () =>
-      requests.filter((request) =>
-        activeTab === "received" ? request.type === "received" : request.type === "sent",
-      ),
+    () => requests.filter((request) => request.type === activeTab),
     [activeTab, requests],
   );
 
@@ -72,26 +71,8 @@ export default function OwnerRequestHistoryPage() {
   return (
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
       <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-10 pt-[111px]">
-        <button
-          type="button"
-          className="absolute left-[10px] top-[55px] h-[26px] w-[15px]"
-          aria-label="이전 화면으로 이동"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="15"
-            height="26"
-            viewBox="0 0 15 26"
-            fill="none"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M3.62068 12.7275L14.2272 23.334L12.1062 25.455L0.43918 13.788C0.157973 13.5067 0 13.1252 0 12.7275C0 12.3298 0.157973 11.9483 0.43918 11.667L12.1062 0L14.2272 2.121L3.62068 12.7275Z"
-              fill="var(--color-primary)"
-            />
-          </svg>
-        </button>
+        <div className="absolute left-[10px] top-[55px] h-[26px] w-[15px]" aria-label="이전 화면으로 이동">
+        </div>
 
         <ToggleTabs
           tabs={TABS}
