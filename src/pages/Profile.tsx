@@ -31,6 +31,8 @@ const ProfileScreen: React.FC = () => {
   );
 
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedNickname, setEditedNickname] = useState(nickname);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,8 +40,6 @@ const ProfileScreen: React.FC = () => {
     review: ReviewItem;
     type: "pending" | "history";
   } | null>(null);
-
-  const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
 
   const [currentProgress, setCurrentProgress] = useState(0);
 
@@ -87,6 +87,36 @@ const ProfileScreen: React.FC = () => {
     setModalData(null); // 데이터 초기화
   };
 
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // 저장 로직
+      const updatedProfile = {
+        ...profileData,
+        nickname: editedNickname,
+      };
+      setGourmetProfile(updatedProfile);
+      alert("프로필이 저장되었습니다!");
+    } else {
+      // 편집 모드로 전환
+      setEditedNickname(nickname);
+    }
+    setIsEditing(!isEditing);
+  };
+
+  const UserAvatarSVG = () => (
+    <svg
+      width="96"
+      height="96"
+      viewBox="0 0 96 96"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="48" cy="48" r="48" fill="#FF6B35" />
+      <circle cx="48" cy="38" r="14" fill="white" />
+      <path d="M24 78c0-13.255 10.745-24 24-24s24 10.745 24 24" fill="white" />
+    </svg>
+  );
+
   return (
     <div className="h-dvh bg-white">
       <div className="h-full flex flex-col max-w-lg mx-auto relative p-4 mt-6">
@@ -101,21 +131,32 @@ const ProfileScreen: React.FC = () => {
           style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}
         >
           <div className="flex items-center mb-5 text-left">
-            <img
-              src={userAvatar}
-              alt="User Avatar"
-              className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover"
-            />
-            <div className="justify-center">
-              <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
+            <div className="mr-4">
+              <UserAvatarSVG />
+            </div>
+            <div className="justify-center flex-1">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={editedNickname}
+                  onChange={(e) => setEditedNickname(e.target.value)}
+                  className="text-2xl font-bold text-gray-900 border-b-2 border-gray-300 focus:border-orange-600 outline-none w-full px-1 py-1"
+                  placeholder="닉네임 입력"
+                />
+              ) : (
+                <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
+              )}
               <p className="text-sm text-gray-500 mt-1 ">{userId}</p>
               <p className="text-xs text-gray-500 mt-1">🗓️ {joinDate}</p>
             </div>
           </div>
 
-          <button className="w-full border border-gray-900 py-2.5 rounded-md text-center mb-8 hover:bg-gray-100 transition duration-150">
+          <button
+            onClick={handleEditToggle}
+            className="w-full border border-gray-900 py-2.5 rounded-md text-center mb-8 hover:bg-gray-100 transition duration-150"
+          >
             <span className="text-base font-semibold text-gray-900">
-              프로필 수정
+              {isEditing ? "저장" : "프로필 수정"}
             </span>
           </button>
 
