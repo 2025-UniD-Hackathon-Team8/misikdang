@@ -7,6 +7,6 @@ import OnboardingPage from "./pages/OnboardingPage.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <OnboardingPage />
+    <App />
   </StrictMode>
 );
