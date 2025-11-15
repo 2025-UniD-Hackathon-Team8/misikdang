@@ -17,7 +17,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`font-medium rounded-lg px-8 py-2  ${className}`}
+      className={`rounded-lg px-8 py-2 ${className}`}
       style={{ backgroundColor: bgColor, color: fgColor }}
       {...props}
     >
