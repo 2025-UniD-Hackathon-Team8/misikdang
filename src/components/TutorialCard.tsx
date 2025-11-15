@@ -9,10 +9,7 @@ interface TutorialCardProps {
   onSwipeLeft?: () => void;
 }
 
-export default function TutorialCard({
-  onSwipeRight,
-  onSwipeLeft,
-}: TutorialCardProps) {
+export default function TutorialCard({ onSwipeRight, onSwipeLeft }: TutorialCardProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
   const opacity = useTransform(x, [-200, 0, 200], [0.5, 1, 0.5]);
@@ -70,11 +67,7 @@ export default function TutorialCard({
       {/* Tutorial Image with Overlays */}
       <div className="relative w-full h-full">
         {/* Background Image */}
-        <img
-          src={tutorialImage}
-          alt="Tutorial"
-          className="w-full h-full object-contain"
-        />
+        <img src={tutorialImage} alt="Tutorial" className="w-full h-full object-contain" style={{ pointerEvents: "none" }} />
 
         <div className="absolute top-24 left-1/2 -translate-x-1/2">
           <p
