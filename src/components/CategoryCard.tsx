@@ -1,48 +1,47 @@
 import type { ReactNode } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { color, motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
+import { colors } from "../constants";
 
-interface FoodCardProps {
-  imageUrl: string;
-  title: string;
-  restaurant: string;
+interface Restaurant {
+  name: string;
   rating: number;
   reviewCount: number;
   distance: string;
-  description: string;
-  discount?: number;
+  thumbnail: string;
+}
+
+interface CategoryCardProps {
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  restaurants: Restaurant[];
   children?: ReactNode;
   onSwipeRight?: () => void;
   index?: number;
   totalCards?: number;
 }
 
-export default function FoodCard({
+export default function CategoryCard({
   imageUrl,
   title,
-  restaurant,
-  rating,
-  reviewCount,
-  distance,
-  description,
-  discount,
+  subtitle,
+  restaurants,
   children,
   onSwipeRight,
   index = 0,
   totalCards = 1,
-}: FoodCardProps) {
+}: CategoryCardProps) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-200, 0, 200], [-15, 0, 15]);
   const opacity = useTransform(x, [-200, 0, 200], [0.5, 1, 0.5]);
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.x > 100) {
-      // 오른쪽으로 스와이프
       onSwipeRight?.();
     }
   };
 
-  // 뒤에 있는 카드들의 스타일
   const isBackground = index > 0;
   const backgroundRotation = index === 1 ? -3 : index === 2 ? -4 : 0;
   const backgroundOpacity = index === 1 ? 0.5 : index === 2 ? 0.8 : 1;
@@ -67,45 +66,22 @@ export default function FoodCard({
         style={{
           zIndex,
           width: "320px",
-          height: "500px",
+          height: "480px",
           left: "50%",
           marginLeft: "-160px",
         }}
       >
-        {/* Food Image */}
-        <div className="w-full h-64 overflow-hidden">
+        <div className="w-full h-40 overflow-hidden">
           <img
             src={imageUrl}
             alt={title}
             className="w-full h-full object-cover"
           />
         </div>
-
-        {/* Content */}
-        <div className="p-6">
-          {/* Title */}
-          <h2 className="text-2xl font-bold mb-1">{title}</h2>
-
-          {/* Restaurant */}
-          <p className="text-sm mb-3" style={{ color: "#666666" }}>
-            {restaurant}
-          </p>
-
-          {/* Rating and Distance */}
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-yellow-500">★</span>
-            <span className="font-semibold">
-              {rating}({reviewCount})
-            </span>
-            <span style={{ color: "#aaaaaa" }}>{distance}</span>
-          </div>
-
-          {/* Description */}
-          <p
-            className="text-sm leading-relaxed mb-6"
-            style={{ color: "#666666" }}
-          >
-            {description}
+        <div className="p-4">
+          <h2 className="text-xl font-bold mb-1">{title}</h2>
+          <p className="text-xs mb-3" style={{ color: "#666666" }}>
+            {subtitle}
           </p>
         </div>
       </motion.div>
@@ -121,7 +97,7 @@ export default function FoodCard({
         opacity,
         zIndex,
         width: "320px",
-        height: "480px",
+        height: "500px",
         left: "50%",
         marginLeft: "-160px",
       }}
@@ -131,7 +107,7 @@ export default function FoodCard({
       onDragEnd={handleDragEnd}
       whileTap={{ cursor: "grabbing" }}
     >
-      {/* Food Image */}
+      {/* Category Image */}
       <div className="w-full h-60 overflow-hidden">
         <img
           src={imageUrl}
@@ -141,33 +117,50 @@ export default function FoodCard({
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="px-4 py-3">
         {/* Title */}
         <h2 className="text-xl font-bold mb-1">{title}</h2>
 
-        {/* Restaurant */}
-        <p className="text-xs mb-2" style={{ color: "#666666" }}>
-          {restaurant}
+        {/* Subtitle */}
+        <p className="text-sm mb-2" style={{ color: "#666666" }}>
+          {subtitle}
         </p>
 
-        {/* Rating and Distance */}
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-yellow-500 text-sm">★</span>
-          <span className="font-semibold text-xs">
-            {rating}({reviewCount})
-          </span>
-          <span className="text-xs" style={{ color: "#aaaaaa" }}>
-            {distance}
-          </span>
-        </div>
-
-        {/* Description */}
+        {/* Restaurant Count */}
         <p
-          className="text-xs leading-relaxed mb-4"
-          style={{ color: "#666666" }}
+          className="text-sm mb-3 font-semibold"
+          style={{ color: colors.gray2 }}
         >
-          {description}
+          근처에 {restaurants.length}개의 식당이 있어요
         </p>
+
+        {/* Restaurant List */}
+        <div className="space-y-2 mb-4 max-h-[200px] overflow-y-auto">
+          {restaurants.map((restaurant, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
+            >
+              <img
+                src={restaurant.thumbnail}
+                alt={restaurant.name}
+                className="w-12 h-12 rounded-lg object-cover"
+              />
+              <div className="flex-1">
+                <p className="text-xs font-medium mb-1">{restaurant.name}</p>
+                <div className="flex items-center gap-1 text-xs">
+                  <span className="text-yellow-500">★</span>
+                  <span className="font-semibold">
+                    {restaurant.rating}({restaurant.reviewCount})
+                  </span>
+                  <span style={{ color: "#aaaaaa" }}>
+                    {restaurant.distance}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Action Button */}
         {children}
