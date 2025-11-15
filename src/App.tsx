@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
@@ -11,6 +11,9 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import Profile from "./pages/Profile";
 import OwnerProfile from "./pages/OwnerProfile";
+import { foodCategories, foodItems } from "./data/mockData";
+import { gourmetProfile, ownerProfile } from "./data/mockProfiles";
+import { initializeMockData } from "./utils/localStorage";
 
 type PageKey =
   | "home"
@@ -30,6 +33,11 @@ function App({ initialPage = "onboarding" }: AppProps) {
   const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
   const [userMode, setUserMode] = useState<UserMode>(null);
   const showBottomNav = currentPage !== "onboarding";
+
+  // 앱 시작 시 mock 데이터 초기화
+  useEffect(() => {
+    initializeMockData(foodCategories, foodItems, gourmetProfile, ownerProfile);
+  }, []);
 
   const handleStartChef = () => {
     setUserMode("chef");

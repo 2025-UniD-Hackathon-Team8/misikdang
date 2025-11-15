@@ -2,50 +2,20 @@ import React, { useState, useMemo } from "react";
 import ToggleTabs from "../components/ToggleTabs";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ReviewModal from "../components/ReviewModal";
-
-interface ProfileData {
-  nickname: string;
-  userId: string;
-  joinDate: string;
-  reviewTemperature: number;
-  reviewCompletionRate: number;
-  pendingReviews: {
-    restaurantName: string;
-    visitDate: string;
-  }[];
-  recentReviews: {
-    restaurantName: string;
-    visitDate: string;
-  }[];
-}
+import { getOwnerProfile, setOwnerProfile } from "../utils/localStorage";
+import type { ProfileData } from "../data/mockProfiles";
 
 type ReviewItem = ProfileData["pendingReviews"][number];
 
-const profileData: ProfileData = {
-  nickname: "막두날두 삼성점",
-  userId: "#B2SW133D",
-  joinDate: "2025년 11월 17일 가입",
-  reviewTemperature: 65.8,
-  reviewCompletionRate: 60,
-  pendingReviews: [
-    { restaurantName: "모몽가모몽가", visitDate: "2025년 11월 12일 방문함" },
-    { restaurantName: "녜횡", visitDate: "2025년 11월 12일 방문함" },
-    { restaurantName: "영웅이", visitDate: "2025년 11월 11일 방문함" },
-    { restaurantName: "호걸이", visitDate: "2025년 11월 11일 방문함" },
-
-    { restaurantName: "정상화", visitDate: "2025년 11월 10일 방문함" },
-    { restaurantName: "신창섭", visitDate: "2025년 11월 9일 방문함" },
-  ],
-  recentReviews: [
-    { restaurantName: "캬캬캬", visitDate: "2025년 11월 8일 방문함" },
-    { restaurantName: "고독한 미식가", visitDate: "2025년 11월 14일 방문함" },
-    { restaurantName: "고독한 치와와", visitDate: "2025년 11월 14일 방문함" },
-    { restaurantName: "왈왈왈", visitDate: "2025년 11월 13일 방문함" },
-    { restaurantName: "크르르 컹컹", visitDate: "2025년 11월 13일 방문함" },
-  ],
-};
-
 const ProfileScreen: React.FC = () => {
+  // localStorage에서 프로필 데이터 가져오기
+  const profileData = getOwnerProfile() as ProfileData | null;
+
+  // 프로필 데이터가 없으면 기본값 사용
+  if (!profileData) {
+    return <div>프로필을 불러오는 중...</div>;
+  }
+
   const { nickname, userId, joinDate, pendingReviews, recentReviews } =
     profileData;
 
@@ -61,6 +31,12 @@ const ProfileScreen: React.FC = () => {
   } | null>(null);
 
   const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
+
+  // 프로필 업데이트 함수 (필요시 사용)
+  const updateProfile = (updates: Partial<ProfileData>) => {
+    const updatedProfile = { ...profileData, ...updates };
+    setOwnerProfile(updatedProfile);
+  };
 
   const reviewTabs = useMemo(
     () =>

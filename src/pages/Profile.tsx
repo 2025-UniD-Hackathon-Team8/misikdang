@@ -2,69 +2,20 @@ import React, { useState, useMemo, useEffect } from "react";
 import ToggleTabs from "../components/ToggleTabs";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ReviewModal from "../components/ReviewModal";
-
-interface ProfileData {
-  nickname: string;
-  userId: string;
-  joinDate: string;
-  reviewTemperature: number;
-  reviewCompletionRate: number;
-  pendingReviews: {
-    restaurantName: string;
-    visitDate: string;
-  }[];
-  recentReviews: {
-    restaurantName: string;
-    visitDate: string;
-  }[];
-}
+import { getGourmetProfile, setGourmetProfile } from "../utils/localStorage";
+import type { ProfileData } from "../data/mockProfiles";
 
 type ReviewItem = ProfileData["pendingReviews"][number];
 
-const profileData: ProfileData = {
-  nickname: "미식한고독가",
-  userId: "#B23DSW13",
-  joinDate: "2025년 11월 15일 가입",
-  reviewTemperature: 65.8,
-  reviewCompletionRate: 60,
-  pendingReviews: [
-    { restaurantName: "KFC 종로점", visitDate: "2025년 11월 12일 방문함" },
-    {
-      restaurantName: "맘스터치 여의도점",
-      visitDate: "2025년 11월 12일 방문함",
-    },
-    { restaurantName: "쉐이크쉑 청담점", visitDate: "2025년 11월 11일 방문함" },
-    { restaurantName: "맥도날드 부산점", visitDate: "2025년 11월 11일 방문함" },
-
-    {
-      restaurantName: "이케아 광명점 푸드코트",
-      visitDate: "2025년 11월 10일 방문함",
-    },
-    {
-      restaurantName: "스타벅스 리저브 을지로점",
-      visitDate: "2025년 11월 9일 방문함",
-    },
-    {
-      restaurantName: "파리바게뜨 잠실점",
-      visitDate: "2025년 11월 8일 방문함",
-    },
-  ],
-  recentReviews: [
-    {
-      restaurantName: "맥도날드 삼성역 8번출구점",
-      visitDate: "2025년 11월 14일 방문함",
-    },
-    {
-      restaurantName: "맥도날드 삼성역 8번출구점",
-      visitDate: "2025년 11월 14일 방문함",
-    },
-
-    { restaurantName: "버거킹 강남점", visitDate: "2025년 11월 13일 방문함" },
-    { restaurantName: "롯데리아 홍대점", visitDate: "2025년 11월 13일 방문함" },
-  ],
-};
-
 const ProfileScreen: React.FC = () => {
+  // localStorage에서 프로필 데이터 가져오기
+  const profileData = getGourmetProfile() as ProfileData | null;
+
+  // 프로필 데이터가 없으면 기본값 사용
+  if (!profileData) {
+    return <div>프로필을 불러오는 중...</div>;
+  }
+
   const {
     nickname,
     userId,
@@ -90,9 +41,11 @@ const ProfileScreen: React.FC = () => {
 
   const [currentProgress, setCurrentProgress] = useState(0);
 
-  const targetProgressWidth = `${reviewCompletionRate}%`;
-
-  const progressWidth = `${reviewCompletionRate}%`;
+  // 프로필 업데이트 함수 (필요시 사용)
+  const updateProfile = (updates: Partial<ProfileData>) => {
+    const updatedProfile = { ...profileData, ...updates };
+    setGourmetProfile(updatedProfile);
+  };
 
   useEffect(() => {
     // 100ms 지연 후 실제 완료율(reviewCompletionRate)로 설정하여 애니메이션 트리거
