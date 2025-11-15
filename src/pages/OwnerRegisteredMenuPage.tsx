@@ -50,7 +50,14 @@ export default function OwnerRegisteredMenuPage() {
     const newCommentsMap: Record<string, CommentItem[]> = {};
     storedMenus.forEach((menu: MenuItem) => {
       const candidates = getCandidatesByCategory(menu.name);
-      newCommentsMap[menu.name] = candidates.map((c: any) => ({
+
+      // nickname 기준으로 중복 제거
+      const uniqueCandidates = candidates.filter(
+        (candidate: any, index: number, self: any[]) =>
+          index === self.findIndex((c) => c.nickname === candidate.nickname)
+      );
+
+      newCommentsMap[menu.name] = uniqueCandidates.map((c: any) => ({
         id: c.id,
         nickname: c.nickname,
         temperature: c.temperature,
@@ -62,9 +69,16 @@ export default function OwnerRegisteredMenuPage() {
 
   const loadCandidates = (categoryName: string) => {
     const candidates = getCandidatesByCategory(categoryName);
+
+    // nickname 기준으로 중복 제거
+    const uniqueCandidates = candidates.filter(
+      (candidate: any, index: number, self: any[]) =>
+        index === self.findIndex((c) => c.nickname === candidate.nickname)
+    );
+
     setCommentsMap((prev) => ({
       ...prev,
-      [categoryName]: candidates.map((c: any) => ({
+      [categoryName]: uniqueCandidates.map((c: any) => ({
         id: c.id,
         nickname: c.nickname,
         temperature: c.temperature,
@@ -226,6 +240,14 @@ export default function OwnerRegisteredMenuPage() {
                             distance: "1.7km",
                           }
                         );
+
+                        // 요청 보낸 후보를 목록에서 제거
+                        setCommentsMap((prev) => ({
+                          ...prev,
+                          [selectedMenu.name]: (
+                            prev[selectedMenu.name] ?? []
+                          ).filter((item) => item.id !== comment.id),
+                        }));
 
                         alert(`${comment.nickname}님에게 요청을 보냈습니다!`);
                       } else {

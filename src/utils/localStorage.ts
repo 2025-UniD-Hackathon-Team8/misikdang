@@ -3,12 +3,11 @@ const STORAGE_KEYS = {
   FOOD_CATEGORIES: "misikdang_food_categories",
   FOOD_ITEMS: "misikdang_food_items",
   USER_MODE: "misikdang_user_mode",
-  USER_REQUESTS: "misikdang_user_requests",
   OWNER_MENUS: "misikdang_owner_menus",
   GOURMET_PROFILE: "misikdang_gourmet_profile",
   OWNER_PROFILE: "misikdang_owner_profile",
   CATEGORY_CANDIDATES: "misikdang_category_candidates", // owner가 올린 메뉴별 테스트 후보 (gourmet가 오른쪽 스와이프한 사용자들)
-  GOURMET_REQUESTS: "misikdang_gourmet_requests", // gourmet가 받은 요청 목록
+  GOURMET_REQUESTS: "misikdang_gourmet_requests", // gourmet가 받은 요청 목록 (owner가 보낸 요청도 포함)
 } as const;
 
 // 제네릭 localStorage 저장 함수
@@ -80,14 +79,6 @@ export function setUserMode(mode: "gourmet" | "chef" | null) {
   setLocalStorage(STORAGE_KEYS.USER_MODE, mode);
 }
 
-export function getUserRequests() {
-  return getLocalStorage(STORAGE_KEYS.USER_REQUESTS, []);
-}
-
-export function setUserRequests(requests: any[]) {
-  setLocalStorage(STORAGE_KEYS.USER_REQUESTS, requests);
-}
-
 export function getOwnerMenus() {
   return getLocalStorage(STORAGE_KEYS.OWNER_MENUS, []);
 }
@@ -126,20 +117,6 @@ export function getOwnerProfile() {
 
 export function setOwnerProfile(profile: any) {
   setLocalStorage(STORAGE_KEYS.OWNER_PROFILE, profile);
-}
-
-// 카테고리 요청 추가 함수
-export function addCategoryRequest(categoryTitle: string, userId: string) {
-  const requests = getUserRequests();
-  const newRequest = {
-    id: `request-${Date.now()}`,
-    categoryTitle,
-    userId,
-    timestamp: new Date().toISOString(),
-    status: "pending" as const,
-  };
-  setUserRequests([...requests, newRequest]);
-  return newRequest;
 }
 
 // 오너 메뉴 카운트 증가 함수
@@ -217,24 +194,34 @@ export function sendRequestToGourmet(
     distance?: string;
   }
 ) {
-  const requests = getGourmetRequests();
+  const gourmetRequests = getGourmetRequests();
   const newRequest = {
     id: `request-${Date.now()}`,
-    type: "received" as const,
-    title: menuName,
-    subtitle:
-      ownerInfo.rating && ownerInfo.reviewCount && ownerInfo.distance
-        ? `${ownerInfo.rating}(${ownerInfo.reviewCount}) ${ownerInfo.distance}`
-        : ownerInfo.name,
+    type: "sent" as const,
+    title: gourmetNickname,
+    subtitle: menuName,
     thumbnail: getRandomColor(),
     gourmetNickname,
     ownerName: ownerInfo.name,
     menuName,
     timestamp: new Date().toISOString(),
   };
-  setGourmetRequests([...requests, newRequest]);
-  console.log("[sendRequestToGourmet] 요청 전송:", newRequest);
+  setGourmetRequests([...gourmetRequests, newRequest]);
+
   return newRequest;
+}
+
+// Gourmet 요청 삭제
+export function removeGourmetRequest(requestId: string) {
+  const requests = getGourmetRequests();
+  const updatedRequests = requests.filter((r: any) => r.id !== requestId);
+  setGourmetRequests(updatedRequests);
+}
+
+// Owner가 보낸 요청 목록 가져오기 (type === "sent")
+export function getOwnerRequests() {
+  const allRequests = getGourmetRequests();
+  return allRequests.filter((r: any) => r.type === "sent");
 }
 
 // 랜덤 색상 생성 (메뉴 썸네일용)
@@ -269,11 +256,6 @@ export function initializeMockData(
 
   if (existingItems.length === 0) {
     setFoodItems(foodItems);
-  }
-
-  // 초기 사용자 요청 및 메뉴가 없으면 빈 배열로 초기화
-  if (getUserRequests().length === 0) {
-    setUserRequests([]);
   }
 
   if (getOwnerMenus().length === 0) {

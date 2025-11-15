@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AcceptModal from "../components/AcceptModal";
 import RequestCardLarge from "../components/RequestCardLarge";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ToggleTabs from "../components/ToggleTabs";
+import { getOwnerRequests, removeGourmetRequest } from "../utils/localStorage";
 
 const TABS = [
   { id: "sent", label: "내가 한 요청" },
@@ -29,6 +30,12 @@ export default function OwnerRequestHistoryPage() {
   );
   const [showAcceptModal, setShowAcceptModal] = useState(false);
 
+  // localStorage\uc5d0\uc11c \uc694\uccad \ubaa9\ub85d \ub85c\ub4dc
+  useEffect(() => {
+    const storedRequests = getOwnerRequests();
+    setRequests(storedRequests);
+  }, []);
+
   const visibleRequests = useMemo(
     () => requests.filter((request) => request.type === activeTab),
     [activeTab, requests]
@@ -36,6 +43,7 @@ export default function OwnerRequestHistoryPage() {
 
   const handleRemoveRequest = (requestId: string) => {
     setRequests((prev) => prev.filter((request) => request.id !== requestId));
+    removeGourmetRequest(requestId);
   };
 
   const handleAcceptRequest = (requestId: string) => {
