@@ -13,11 +13,7 @@ import Profile from "./pages/Profile";
 import OwnerProfile from "./pages/OwnerProfile";
 import { foodCategories, foodItems } from "./data/mockData";
 import { gourmetProfile, ownerProfile } from "./data/mockProfiles";
-import {
-  initializeMockData,
-  getUserMode as loadUserMode,
-  setUserMode as persistUserMode,
-} from "./utils/localStorage";
+import { initializeMockData } from "./utils/localStorage";
 
 type PageKey =
   | "home"
@@ -35,26 +31,13 @@ type AppProps = {
 
 function App({ initialPage = "onboarding" }: AppProps) {
   const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
-  const [userMode, setUserMode] = useState<UserMode>(() => loadUserMode());
+  const [userMode, setUserMode] = useState<UserMode>(null);
   const showBottomNav = currentPage !== "onboarding";
 
   // 앱 시작 시 mock 데이터 초기화
   useEffect(() => {
     initializeMockData(foodCategories, foodItems, gourmetProfile, ownerProfile);
   }, []);
-
-  useEffect(() => {
-    persistUserMode(userMode);
-  }, [userMode]);
-
-  useEffect(() => {
-    if (currentPage !== "onboarding") return;
-    if (userMode === "gourmet") {
-      setCurrentPage("home");
-    } else if (userMode === "chef") {
-      setCurrentPage("owner-registered-menu");
-    }
-  }, [currentPage, userMode]);
 
   const handleStartChef = () => {
     setUserMode("chef");
