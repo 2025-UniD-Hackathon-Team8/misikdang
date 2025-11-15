@@ -112,10 +112,25 @@ export default function RegisterMenu1() {
       window.location.href = "/";
     }
   };
+
+  const handleBack = async () => {
+    try {
+      const mod = await import("../App");
+      const AppPage = mod && mod.default ? mod.default : null;
+      const root = document.getElementById("root");
+      if (root && AppPage) {
+        createRoot(root).render(<AppPage initialPage="owner-registered-menu" />);
+        return;
+      }
+    } catch (error) {
+      console.error("이전 화면으로 돌아가지 못했습니다:", error);
+    }
+    window.location.href = "/";
+  };
   return (
     <div className="flex min-h-screen w-full flex-col bg-white">
       {/* 1. 헤더 */}
-      <TopNavigator title="위치 등록" onBackClick={() => window.history.back()} />
+      <TopNavigator title="위치 등록" onBackClick={handleBack} />
 
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
