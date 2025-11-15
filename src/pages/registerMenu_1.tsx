@@ -64,6 +64,7 @@ export default function RegisterMenu1() {
     const env = (import.meta as unknown as { env?: Record<string, string> }).env || {};
     const GOOGLE_API_KEY = env.VITE_GOOGLE_MAPS_API_KEY || env.REACT_APP_GOOGLE_MAPS_API_KEY || "";
 
+      console.log("Google API Key:", GOOGLE_API_KEY);
     setLoading(true);
     try {
       const q = encodeURIComponent(addressQuery);
