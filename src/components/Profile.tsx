@@ -1,11 +1,6 @@
-import React, { useState } from "react";
-
-// --- Types/Interfaces & Sample Data ---
-interface ReviewItemProps {
-  restaurantName: string;
-  visitDate: string;
-  imageSource: string;
-}
+import React, { useState, useMemo } from "react";
+import ToggleTabs from "./ToggleTabs"; // ToggleTabs 컴포넌트 파일 경로에 맞게 수정해주세요.
+import RequestCardSmall from "./RequestCardSmall"; // RequestCardSmall 컴포넌트 파일 경로에 맞게 수정해주세요.
 
 interface ProfileData {
   nickname: string;
@@ -48,19 +43,6 @@ const profileData: ProfileData = {
   ],
 };
 
-// --- Sub-Components ---
-const ReviewItem: React.FC<ReviewItemProps> = ({ restaurantName, visitDate, imageSource }) => {
-  return (
-    <a href="#" className="flex items-center py-3 border-b border-gray-100 hover:bg-gray-50 transition duration-150">
-      <img src={imageSource} alt="Review thumbnail" className="w-16 h-16 rounded-lg mr-4 bg-gray-200 object-cover" />
-      <div className="flex-1">
-        <h4 className="text-base font-semibold text-gray-900">{restaurantName}</h4>
-        <p className="text-xs text-gray-500 mt-1">{visitDate}</p>
-      </div>
-    </a>
-  );
-};
-
 // --- Main Component (수정됨) ---
 const ProfileScreen: React.FC = () => {
   const { nickname, userId, joinDate, reviewTemperature, reviewCompletionRate, pendingReviews, recentReviews } = profileData;
@@ -68,8 +50,24 @@ const ProfileScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">("pendingReview");
 
   const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
-  const reviewThumbnail = "https://via.placeholder.com/60?text=Burger";
+  // reviewThumbnail은 RequestCardSmall에서 thumbnailColor를 사용하므로 직접 사용되지 않습니다.
+  // const reviewThumbnail = "https://via.placeholder.com/60?text=Burger";
   const progressWidth = `${reviewCompletionRate}%`;
+
+  // ToggleTabs에 전달할 탭 데이터 정의
+  const reviewTabs = useMemo(
+    () =>
+      [
+        { id: "pendingReview", label: "대기 중인 리뷰" },
+        { id: "reviewHistory", label: "리뷰 내역" },
+      ] as const,
+    []
+  );
+
+  // onTabSelect 핸들러: activeTab 타입을 string으로 처리하기 위해 명시적 캐스팅
+  const handleTabSelect = (id: string) => {
+    setActiveTab(id as "pendingReview" | "reviewHistory");
+  };
 
   return (
     // 1. 전체 화면 높이 고정: h-dvh 및 배경색 설정
@@ -77,12 +75,7 @@ const ProfileScreen: React.FC = () => {
       {/* 2. 내부 컨테이너: h-full과 flex-col로 높이를 h-dvh에 맞춥니다. */}
       <div className="h-full flex flex-col max-w-lg mx-auto relative p-4">
         {/* 3. 고정될 상단 영역 (스크롤되지 않음) - 상단 Safe Area 적용 */}
-        {/* 기존 pt-10을 제거하고, Safe Area 높이 + 기본 패딩 (예: 2rem=32px)을 calc로 합산 */}
-        <div
-          className="px-5 flex-shrink-0"
-          // Safe Area 높이 (env(safe-area-inset-top)) + 원하는 기본 상단 여백(예: pt-8 = 32px)을 합산하여 상단 패딩 설정
-          style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}
-        >
+        <div className="px-5 flex-shrink-0" style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}>
           {/* 프로필 헤더 */}
           <div className="flex items-center mb-5 text-left">
             <img src={userAvatar} alt="User Avatar" className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover" />
@@ -112,65 +105,43 @@ const ProfileScreen: React.FC = () => {
             <p className="text-sm font-bold text-gray-800 text-left">리뷰 작성률 {reviewCompletionRate}%</p>
             <p className="text-xs text-gray-500 mt-1 text-left">표시될 만큼 미식한 식당의 리뷰를 작성했어요</p>
           </div>
-          {/* 리뷰 탭 버튼 (수정된 부분) */}
-          <div className="flex mb-5">
-            <div className="flex w-full bg-gray-100 rounded-[10px] p-1.5 shadow-inner">
-              {/* 1. '대기 중인 리뷰' 버튼 */}
-              <button
-                // 상태 업데이트 핸들러 추가
-                onClick={() => setActiveTab("pendingReview")}
-                className={`flex-1 py-2 rounded-[10px] text-center transition duration-300 ease-in-out ${
-                  activeTab === "pendingReview"
-                    ? "bg-white shadow-md z-10 transform translate-y-px" // 활성화 스타일
-                    : "bg-transparent" // 비활성화 스타일
-                }`}
-              >
-                <span
-                  className={`text-base font-semibold ${
-                    activeTab === "pendingReview" ? "text-gray-900 font-bold" : "text-gray-700" // 텍스트 색상 변경
-                  }`}
-                >
-                  대기 중인 리뷰
-                </span>
-              </button>
 
-              {/* 2. '리뷰 내역' 버튼 */}
-              <button
-                // 상태 업데이트 핸들러 추가
-                onClick={() => setActiveTab("reviewHistory")}
-                className={`flex-1 py-2 rounded-[10px] text-center transition duration-300 ease-in-out ${
-                  activeTab === "reviewHistory"
-                    ? "bg-white shadow-md z-10 transform translate-y-px" // 활성화 스타일
-                    : "bg-transparent" // 비활성화 스타일
-                }`}
-              >
-                <span
-                  className={`text-base font-semibold ${
-                    activeTab === "reviewHistory" ? "text-gray-900 font-bold" : "text-gray-700" // 텍스트 색상 변경
-                  }`}
-                >
-                  리뷰 내역
-                </span>
-              </button>
-            </div>
+          {/* 리뷰 탭 버튼 (ToggleTabs 컴포넌트로 대체) */}
+          <div className="flex mb-5 justify-center">
+            <ToggleTabs tabs={reviewTabs} activeTabId={activeTab} onTabSelect={handleTabSelect} className="mx-auto" />
           </div>
         </div>
 
-        {/* 4. 리뷰 목록 섹션: 스크롤 영역 - 하단 Safe Area 적용 */}
+        {/* 4. 리뷰 목록 섹션: 스크롤 영역 - RequestCardSmall 적용 */}
         <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}>
           {/* Case 1: '리뷰 내역' 탭 활성화 시 */}
           {activeTab === "reviewHistory" &&
             recentReviews.map((review, index) => (
-              <ReviewItem key={index} restaurantName={review.restaurantName} visitDate={review.visitDate} imageSource={reviewThumbnail} />
+              // ReviewItem 대신 RequestCardSmall 사용
+              <RequestCardSmall
+                key={index}
+                title={review.restaurantName}
+                subtitle={review.visitDate}
+                thumbnailColor="#E0E0E0" // 임시 썸네일 색상, 필요에 따라 동적으로 변경 가능
+                showRatingIcon={true} // 리뷰 내역이므로 평점 아이콘 표시 (기본값)
+                className="mb-3" // 카드 간 간격 추가
+              />
             ))}
 
           {/* Case 2: '대기 중인 리뷰' 탭 활성화 시 */}
           {activeTab === "pendingReview" &&
             // **pendingReviews 배열 길이에 따른 조건부 렌더링**
             (pendingReviews.length > 0 ? (
-              // pendingReviews가 1개 이상일 경우: 목록을 표시
+              // pendingReviews가 1개 이상일 경우: RequestCardSmall 목록을 표시
               pendingReviews.map((review, index) => (
-                <ReviewItem key={index} restaurantName={review.restaurantName} visitDate={review.visitDate} imageSource={reviewThumbnail} />
+                <RequestCardSmall
+                  key={index}
+                  title={review.restaurantName}
+                  subtitle={review.visitDate}
+                  thumbnailColor="#FFDDC1" // 대기 중인 리뷰는 다른 색상으로 구분
+                  showRatingIcon={false} // 대기 중인 리뷰는 평점 아이콘 미표시
+                  className="mb-3" // 카드 간 간격 추가
+                />
               ))
             ) : (
               // pendingReviews가 0개일 경우: 안내 메시지 표시
