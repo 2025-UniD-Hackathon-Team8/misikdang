@@ -84,11 +84,11 @@ const ProfileScreen: React.FC = () => {
           style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}
         >
           {/* 프로필 헤더 */}
-          <div className="flex items-center mb-5">
+          <div className="flex items-center mb-5 text-left">
             <img src={userAvatar} alt="User Avatar" className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover" />
             <div className="justify-center">
               <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
-              <p className="text-sm text-gray-500 mt-1">{userId}</p>
+              <p className="text-sm text-gray-500 mt-1 ">{userId}</p>
               <p className="text-xs text-gray-500 mt-1">🗓️ {joinDate}</p>
             </div>
           </div>
