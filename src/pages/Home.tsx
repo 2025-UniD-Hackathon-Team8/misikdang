@@ -7,6 +7,7 @@ import EndCard from "../components/EndCard";
 import { colors } from "../constants/colors";
 import { foodCategories, foodItems } from "../data/mockData";
 import { useImageColor } from "../hooks/useImageColor";
+import { addCategoryCandidate, getGourmetProfile } from "../utils/localStorage";
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(-1); // -1로 시작하여 튜토리얼 카드 표시
@@ -36,12 +37,39 @@ export default function Home() {
 
   const handleSwipeRight = () => {
     if (currentIndex < allCards.length) {
+      const currentCard = allCards[currentIndex];
+
+      // 카테고리 카드를 오른쪽으로 스와이프하면 해당 카테고리 owner의 테스트 후보에 등록
+      if (currentCard && currentCard.type === "category") {
+        // 카테고리 제목에서 한글 부분만 추출 (예: "햄부기 Hamburgers" -> "햄부기")
+        const categoryName = currentCard.title.split(" ")[0];
+        console.log(
+          "[Home] 카테고리 스와이프:",
+          categoryName,
+          currentCard.title
+        );
+
+        // 현재 사용자 정보 가져오기
+        const userProfile = getGourmetProfile();
+        console.log("[Home] 사용자 프로필:", userProfile);
+        if (userProfile) {
+          const result = addCategoryCandidate(categoryName, {
+            nickname: userProfile.nickname,
+            temperature: userProfile.reviewTemperature,
+          });
+          console.log("[Home] 후보 추가 완료:", result);
+        } else {
+          console.error("[Home] 사용자 프로필이 없습니다!");
+        }
+      }
+
       setCurrentIndex(currentIndex + 1);
     }
   };
 
   const handleSwipeLeft = () => {
     if (currentIndex < allCards.length) {
+      // 왼쪽 스와이프는 그냥 다음 카드로 넘어감
       setCurrentIndex(currentIndex + 1);
     }
   };

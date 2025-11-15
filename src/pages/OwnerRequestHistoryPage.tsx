@@ -60,7 +60,7 @@ export default function OwnerRequestHistoryPage() {
 
   const visibleRequests = useMemo(
     () => requests.filter((request) => request.type === activeTab),
-    [activeTab, requests],
+    [activeTab, requests]
   );
 
   const handleRemoveRequest = (requestId: string) => {
@@ -79,8 +79,10 @@ export default function OwnerRequestHistoryPage() {
   return (
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
       <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-10 pt-[111px]">
-        <div className="absolute left-[10px] top-[55px] h-[26px] w-[15px]" aria-label="이전 화면으로 이동">
-        </div>
+        <div
+          className="absolute left-[10px] top-[55px] h-[26px] w-[15px]"
+          aria-label="이전 화면으로 이동"
+        ></div>
 
         <ToggleTabs
           tabs={TABS}
@@ -137,7 +139,9 @@ export default function OwnerRequestHistoryPage() {
             );
           })}
           {visibleRequests.length === 0 && (
-            <p className="text-sm text-[var(--color-gray-2)]">표시할 요청이 아직 없어요.</p>
+            <p className="text-sm text-[var(--color-gray-2)]">
+              표시할 요청이 아직 없어요.
+            </p>
           )}
         </div>
       </main>
