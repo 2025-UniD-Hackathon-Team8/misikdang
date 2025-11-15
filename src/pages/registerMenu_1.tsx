@@ -1,6 +1,6 @@
 // src/registerMenu_1.tsx
 import { createRoot } from "react-dom/client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import { Search } from "lucide-react"; 
 import Button from "../components/Button.tsx"; 
 import TopNavigator from "../components/TopNavigator.tsx"; 
@@ -15,13 +15,21 @@ export default function RegisterMenu1() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
-
+  const [currentProgress, setCurrentProgress] = useState(0);
   // Load existing data on mount
   useEffect(() => {
     const savedData = getMenuData();
     if (savedData.location) {
       setLocation(savedData.location);
     }
+  }, []);
+
+  // Progress bar animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentProgress(33.33);
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -113,7 +121,10 @@ export default function RegisterMenu1() {
       <div className="w-full px-4 py-3">
         <div className="flex h-1.5 w-full rounded-full bg-gray-200">
           {/* 현재 단계 (1/3) */}
-          <div className="h-1.5 w-1/3 rounded-full bg-black"></div>
+          <div 
+            className="h-1.5 rounded-full bg-black transition-all duration-1000 ease-out" 
+            style={{ width: `${currentProgress}%` }}
+          ></div>
         </div>
       </div>
 
