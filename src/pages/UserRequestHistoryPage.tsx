@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import AcceptModal from "../components/AcceptModal";
 import RequestCardLarge from "../components/RequestCardLarge";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ToggleTabs from "../components/ToggleTabs";
@@ -52,6 +53,8 @@ const REQUESTS: RequestItem[] = [
 export default function UserRequestHistoryPage() {
   const [activeTab, setActiveTab] = useState<TabId>("sent");
   const [requests, setRequests] = useState<RequestItem[]>(REQUESTS);
+  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(() => new Set());
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
 
   const visibleRequests = useMemo(
     () =>
@@ -65,8 +68,13 @@ export default function UserRequestHistoryPage() {
     setRequests((prev) => prev.filter((request) => request.id !== requestId));
   };
 
-  const handleAcceptRequest = (title: string) => {
-    alert(`${title} 요청 수락 기능이 곧 준비될 예정입니다.`);
+  const handleAcceptRequest = (requestId: string) => {
+    setAcceptedRequests((prev) => {
+      const next = new Set(prev);
+      next.add(requestId);
+      return next;
+    });
+    setShowAcceptModal(true);
   };
 
   return (
@@ -82,6 +90,7 @@ export default function UserRequestHistoryPage() {
         <div className="flex flex-col items-center gap-[15px]">
           {visibleRequests.map((request) => {
             const isReceived = request.type === "received";
+            const isAccepted = acceptedRequests.has(request.id);
             return (
               <div key={request.id} className="w-full">
                 {isReceived ? (
@@ -90,15 +99,27 @@ export default function UserRequestHistoryPage() {
                     subtitle={request.subtitle}
                     thumbnailColor={request.thumbnail}
                     onClose={() => handleRemoveRequest(request.id)}
-                    leftAction={{
-                      label: "거절하기",
-                      variant: "secondary",
-                      onClick: () => handleRemoveRequest(request.id),
-                    }}
-                    rightAction={{
-                      label: "수락하기",
-                      onClick: () => handleAcceptRequest(request.title),
-                    }}
+                    leftAction={
+                      isAccepted
+                        ? undefined
+                        : {
+                            label: "거절하기",
+                            variant: "secondary",
+                            onClick: () => handleRemoveRequest(request.id),
+                          }
+                    }
+                    rightAction={
+                      isAccepted
+                        ? {
+                            label: "수락되었습니다",
+                            disabled: true,
+                            fullWidth: true,
+                          }
+                        : {
+                            label: "수락하기",
+                            onClick: () => handleAcceptRequest(request.id),
+                          }
+                    }
                   />
                 ) : (
                   <RequestCardSmall
@@ -117,6 +138,9 @@ export default function UserRequestHistoryPage() {
           )}
         </div>
       </main>
+      {showAcceptModal && (
+        <AcceptModal message="수락되었습니다!" onClose={() => setShowAcceptModal(false)} />
+      )}
     </div>
   );
 }
