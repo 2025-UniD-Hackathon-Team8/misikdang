@@ -14,6 +14,7 @@ interface FoodCardProps {
   discount?: number;
   children?: ReactNode;
   onSwipeRight?: () => void;
+  onSwipeLeft?: () => void;
   index?: number;
   totalCards?: number;
 }
@@ -29,6 +30,7 @@ export default function FoodCard({
   discount,
   children,
   onSwipeRight,
+  onSwipeLeft,
   index = 0,
   totalCards = 1,
 }: FoodCardProps) {
@@ -40,6 +42,9 @@ export default function FoodCard({
     if (info.offset.x > 100) {
       // 오른쪽으로 스와이프
       onSwipeRight?.();
+    } else if (info.offset.x < -100) {
+      // 왼쪽으로 스와이프
+      onSwipeLeft?.();
     }
   };
 

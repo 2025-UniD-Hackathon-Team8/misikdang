@@ -38,6 +38,12 @@ export default function Home() {
     }
   };
 
+  const handleSwipeLeft = () => {
+    if (currentIndex < allCards.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
   return (
     <div
       className="w-full min-h-screen transition-all duration-700 ease-in-out"
@@ -115,6 +121,7 @@ export default function Home() {
                   key={`current-${currentIndex}`}
                   {...currentCard}
                   onSwipeRight={handleSwipeRight}
+                  onSwipeLeft={handleSwipeLeft}
                   index={0}
                   totalCards={3}
                 />
@@ -125,6 +132,7 @@ export default function Home() {
                   key={`current-${currentIndex}`}
                   {...currentCard}
                   onSwipeRight={handleSwipeRight}
+                  onSwipeLeft={handleSwipeLeft}
                   index={0}
                   totalCards={3}
                 >
