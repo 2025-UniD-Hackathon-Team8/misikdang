@@ -5,7 +5,7 @@ import TopNavigator from "../components/TopNavigator.tsx";
 import { createRoot } from "react-dom/client";
 //import TabBar from "./components/TabBar"; 
 import { colors } from "../constants/colors.ts"; 
-import { getMenuData, saveMenuData, validateStep3, downloadMenuDataAsJSON, clearMenuData } from "../utils/menuDataManager.ts";
+import { getMenuData, saveMenuData, validateStep3, clearMenuData, addMenuToList, type MenuRegistrationData } from "../utils/menuDataManager.ts";
 
 export default function RegisterMenu_3() {
   // 1. 이미지 미리보기 URL을 저장할 state
@@ -19,6 +19,7 @@ export default function RegisterMenu_3() {
 
   // Load existing data on mount
   useEffect(() => {
+
     const savedData = getMenuData();
     setImagePreview(savedData.imagePreview);
     setQuantity(savedData.quantity);
@@ -86,31 +87,58 @@ export default function RegisterMenu_3() {
     if (!validation.valid) {
       setValidationError(validation.error);
       return;
+    
     }
 
     setIsSubmitting(true);
     try {
-      // Save image preview and quantity to complete the data
-      const currentData = getMenuData();
-      const completeData = {
-        ...currentData,
-        imagePreview,
-        quantity,
+      // Build an explicit final payload (don't rely on getMenuData to carry
+      // transient image data). This ensures menuName and imagePreview are
+      // present in the payload we send to the server, download, and store.
+ ;    const persisted = getMenuData();
+      const finalPayload: MenuRegistrationData = {
+        location: persisted.location ?? null,
+        menuName: persisted.menuName ?? "",
+        menuPrice: persisted.menuPrice ?? "",
+        discount: persisted.discount ?? "",
+        description: persisted.description ?? "",
+        // include the in-memory image preview (data URL)
+        imagePreview: imagePreview ?? null,
+        imageFile: null,
+        quantity: quantity ?? "",
       };
 
-      // Save to localStorage
-      saveMenuData(completeData);
+      // Save non-image fields to localStorage
+      saveMenuData(finalPayload);
 
-      // Download as JSON file
-      downloadMenuDataAsJSON(completeData);
+      // Persist the final payload to localStorage (owner-visible list).
+      // We intentionally do NOT send this to any local filesystem server; all
+      // data is stored in the browser's localStorage under the menus list key.
+      try {
+        addMenuToList(finalPayload);
+      } catch (err) {
+        console.warn("Failed to append menu to local list:", err);
+      }
 
-      // Clear the data after successful submission
+      // Clear the data after submission
       clearMenuData();
 
       // Show success message
-      alert("메뉴 등록이 완료되었습니다!\\n");
+      alert("메뉴 등록이 완료되었습니다!");
 
-      // Navigate back to home
+      // Navigate to OwnerRegisteredMenuPage
+      try {
+        const mod = await import("./OwnerRegisteredMenuPage");
+        const Page = mod && mod.default ? mod.default : null;
+        const root = document.getElementById("root");
+        if (root && Page) {
+          createRoot(root).render(<Page />);
+          return;
+        }
+      } catch (e) {
+        console.warn("Could not dynamically load OwnerRegisteredMenuPage, falling back to home:", e);
+      }
+      // fallback
       window.location.href = "/";
     } catch (error) {
       console.error("Failed to complete registration:", error);
@@ -211,7 +239,7 @@ export default function RegisterMenu_3() {
             </div>
           </div>
         </form>
-        {/* 3-2. 다음 버튼 */}
+        {/* 3-2. 완료 버튼 */}
         <div className="mt-4 w-full">
           <Button
             onClick={handleComplete}

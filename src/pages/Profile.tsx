@@ -62,9 +62,9 @@ const ProfileScreen: React.FC = () => {
 
   const [currentProgress, setCurrentProgress] = useState(0);
 
-  const targetProgressWidth = `${reviewCompletionRate}%`;
+  //const targetProgressWidth = `${reviewCompletionRate}%`;
 
-  const progressWidth = `${reviewCompletionRate}%`;
+  //const progressWidth = `${reviewCompletionRate}%`;
 
   useEffect(() => {
     // 100ms 지연 후 실제 완료율(reviewCompletionRate)로 설정하여 애니메이션 트리거

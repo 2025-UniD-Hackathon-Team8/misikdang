@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import RequestCardLarge from "../components/RequestCardLarge";
+import { getMenusList, type StoredMenuListItem } from "../utils/menuDataManager";
 
 type MenuItem = {
   id: string;
@@ -9,7 +10,8 @@ type MenuItem = {
   count: number;
 };
 
-const MENU_ITEMS: MenuItem[] = [
+// original default menus (keep these unchanged)
+const DEFAULT_MENU_ITEMS: MenuItem[] = [
   {
     id: "menu-1",
     name: "햄버거",
@@ -28,7 +30,7 @@ const MENU_ITEMS: MenuItem[] = [
     thumbnail: "#f5e6ff",
     count: 1,
   },
-] as const;
+];
 
 type CommentItem = {
   id: string;
@@ -97,7 +99,7 @@ const MENU_COMMENTS: Record<string, CommentItem[]> = {
 };
 
 export default function OwnerRegisteredMenuPage() {
-  const menuItems = useMemo(() => MENU_ITEMS, []);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(DEFAULT_MENU_ITEMS);
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const [commentsMap, setCommentsMap] =
     useState<Record<string, CommentItem[]>>(MENU_COMMENTS);
@@ -124,6 +126,26 @@ export default function OwnerRegisteredMenuPage() {
       alert("메뉴 등록 화면으로 이동할 수 없어요. 잠시 후 다시 시도해주세요.");
     }
   };
+
+  // Load menus from localStorage (populated by register flow) on mount
+  useEffect(() => {
+    try {
+      const stored = getMenusList();
+      if (stored && stored.length > 0) {
+        // map stored format to MenuItem and append below defaults
+        const mapped: MenuItem[] = stored.map((s: StoredMenuListItem) => ({
+          id: s.id,
+          name: s.name,
+          thumbnail: s.thumbnail || "#f0f0f0",
+          count: s.count ?? 0,
+        }));
+        setMenuItems((prev) => [...prev, ...mapped]);
+        return;
+      }
+    } catch (err) {
+      console.warn("Failed to load stored menus:", err);
+    }
+  }, []);
 
   return (
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
