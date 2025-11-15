@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { createRoot } from "react-dom/client";
 import RequestCardLarge from "../components/RequestCardLarge";
 
 type MenuItem = {
@@ -110,6 +111,20 @@ export default function OwnerRegisteredMenuPage() {
     alert("뒤로가기 기능은 곧 구현될 예정입니다.");
   };
 
+  const handleAddMenu = async () => {
+    try {
+      const mod = await import("./registerMenu_1");
+      const Page = mod && mod.default ? mod.default : null;
+      const root = document.getElementById("root");
+      if (root && Page) {
+        createRoot(root).render(<Page />);
+      }
+    } catch (error) {
+      console.error("registerMenu_1 로 이동하지 못했습니다:", error);
+      alert("메뉴 등록 화면으로 이동할 수 없어요. 잠시 후 다시 시도해주세요.");
+    }
+  };
+
   return (
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
       <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-12 pt-[125px]">
@@ -172,6 +187,7 @@ export default function OwnerRegisteredMenuPage() {
               <button
                 type="button"
                 className="flex h-[75px] w-[345px] items-center justify-center rounded-[10px] bg-white text-[36px] font-normal text-[#000000] shadow-[0_8px_20px_rgba(0,0,0,0.05)]"
+                onClick={handleAddMenu}
               >
                 +
               </button>
