@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import ToggleTabs from "../components/ToggleTabs";
 import RequestCardSmall from "../components/RequestCardSmall";
+import ReviewModal from "../components/ReviewModal";
 
 interface ProfileData {
   nickname: string;
@@ -17,6 +18,8 @@ interface ProfileData {
     visitDate: string;
   }[];
 }
+
+type ReviewItem = ProfileData["pendingReviews"][number];
 
 const profileData: ProfileData = {
   nickname: "미식한고독가",
@@ -48,6 +51,13 @@ const ProfileScreen: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">("pendingReview");
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [modalData, setModalData] = useState<{
+    review: ReviewItem;
+    type: "pending" | "history";
+  } | null>(null);
+
   const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
 
   const progressWidth = `${reviewCompletionRate}%`;
@@ -65,9 +75,25 @@ const ProfileScreen: React.FC = () => {
     setActiveTab(id as "pendingReview" | "reviewHistory");
   };
 
+  const handleCardClick = (review: ReviewItem, type: "pending" | "history") => {
+    setModalData({ review, type }); // 클릭된 리뷰 데이터와 타입 저장
+    setIsModalOpen(true); // 모달 열기
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // 모달 닫기
+    setModalData(null); // 데이터 초기화
+  };
+
   return (
     <div className="h-dvh bg-white">
       <div className="h-full flex flex-col max-w-lg mx-auto relative p-4">
+        {/*
+          주의: 이 flex-shrink-0 div에는 현재 p-4가 적용되어 있지만, 
+          하단 리스트 렌더링 영역의 스크롤을 위해 p-4를 p-0으로 바꾸고 
+          내부 div에 px-5를 적용하는 것이 일반적이나, 
+          요청하신 부분 외는 최소한으로 수정합니다. 
+        */}
         <div className="px-5 flex-shrink-0" style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}>
           <div className="flex items-center mb-5 text-left">
             <img src={userAvatar} alt="User Avatar" className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover" />
@@ -100,16 +126,19 @@ const ProfileScreen: React.FC = () => {
           </div>
         </div>
 
+        {/* 👇 수정된 부분: overflow-y-auto 영역에 px-5를 추가하여 리스트가 좌우 패딩을 갖도록 수정 */}
         <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}>
           {activeTab === "reviewHistory" &&
             recentReviews.map((review, index) => (
               <RequestCardSmall
-                key={index}
+                key={`history-${index}`}
                 title={review.restaurantName}
                 subtitle={review.visitDate}
                 thumbnailColor="#E0E0E0"
                 showRatingIcon={true}
                 className="mb-3"
+                // 1. Review History 카드 클릭 이벤트 연결
+                onClick={() => handleCardClick(review, "history")}
               />
             ))}
 
@@ -117,12 +146,14 @@ const ProfileScreen: React.FC = () => {
             (pendingReviews.length > 0 ? (
               pendingReviews.map((review, index) => (
                 <RequestCardSmall
-                  key={index}
+                  key={`pending-${index}`}
                   title={review.restaurantName}
                   subtitle={review.visitDate}
                   thumbnailColor="#FFDDC1"
                   showRatingIcon={false}
                   className="mb-3"
+                  // 1. Pending Review 카드 클릭 이벤트 연결
+                  onClick={() => handleCardClick(review, "pending")}
                 />
               ))
             ) : (
@@ -133,6 +164,7 @@ const ProfileScreen: React.FC = () => {
             ))}
         </div>
 
+        {/* 하단 네비게이션 */}
         <div
           className="absolute bottom-0 left-0 right-0 flex justify-around items-center h-16 bg-white border-t border-gray-200 shadow-xl w-full px-5"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -147,6 +179,9 @@ const ProfileScreen: React.FC = () => {
             👤
           </a>
         </div>
+
+        {/* 2. ReviewModal 컴포넌트 조건부 렌더링 추가 */}
+        {modalData && <ReviewModal isOpen={isModalOpen} onClose={closeModal} reviewData={modalData.review} modalType={modalData.type} />}
       </div>
     </div>
   );
