@@ -1,5 +1,5 @@
 import "./App.css";
-import Button from "./components/Button";
+import OwnerRequestHistoryPage from "./pages/OwnerRequestHistoryPage";
 
 function App() {
   return (
