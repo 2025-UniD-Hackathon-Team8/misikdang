@@ -4,12 +4,14 @@ import "./App.css";
 
 // 1. components 폴더에서 Profile 컴포넌트를 import 합니다.
 import Profile from "./pages/Profile";
+import OwnerProfile from "./pages/OwnerProfile";
 import OnboardingPage from "./pages/OnboardingPage";
 import OwnerRegisteredMenuPage from "./pages/OwnerRegisteredMenuPage";
 import Home from "./pages/Home";
+import OwnerRequestHistoryPage from "./pages/OwnerRequestHistoryPage";
 
 function App() {
-  return <Home />;
+  return <OwnerProfile />;
   // const [currentPage, setCurrentPage] = useState<"onboarding" | "owner-registered-menu">(
   //   "onboarding",
   // );

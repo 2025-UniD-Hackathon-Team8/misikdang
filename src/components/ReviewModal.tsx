@@ -1,19 +1,19 @@
 import React, { useState } from "react";
+import type { ReactNode } from "react"; // ReactNode는 이미 임포트되어 있으니, 인터페이스에 사용될 수 있도록 유지합니다.
 
 // Props의 타입 정의
 interface ReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // 리뷰 데이터 타입은 ProfileScreen에서 정의한 것을 재활용
   reviewData: {
     restaurantName: string;
     visitDate: string;
-    // 추후 실제 리뷰 내용도 포함될 수 있음
     reviewContent?: string;
   };
-  // 'pending': 작성/수정 모드 (image_4cee38.png 스타일)
-  // 'history': 조회 모드 (image_4cf0e1.png 또는 image_4cee01.png 스타일)
+  // 'pending': 작성/수정, 'history': 조회
   modalType: "pending" | "history";
+  // ⭐️ 추가: 별점 표시 여부를 외부에서 제어하기 위한 Props
+  showRating: boolean;
 }
 
 // 임시 필드 컴포넌트
@@ -39,7 +39,8 @@ const StarRating: React.FC<{ rating: number; onRate?: (rating: number) => void; 
   return <div className="flex justify-center space-x-1 mt-4">{stars}</div>;
 };
 
-const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, modalType }) => {
+// ⭐️ showRating Props를 추가로 받도록 함수 시그니처 수정
+const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, modalType, showRating }) => {
   if (!isOpen) return null; // 모달이 닫혀있으면 아무것도 렌더링하지 않음
 
   // 폼 관련 상태 (리뷰 작성/수정 모드에 사용)
@@ -71,8 +72,6 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
     <div className="fixed inset-0 bg-black flex items-center justify-center z-50 p-4" style={{ backgroundColor: "rgba(0, 0, 0, 0.3)" }}>
       {/* 모달 내용 컨테이너 */}
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm max-h-[90dvh] overflow-y-auto transform transition-all duration-300">
-        {/* 닫기 버튼 */}
-
         {/* 모달 헤더 (식당 정보) */}
         <div className="p-6 pb-2 border-b border-gray-100 sticky top-0 bg-white z-[1] relative ">
           <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 p-2 z-10">
@@ -131,12 +130,12 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
             )}
           </ReviewField>
 
-          {/* 이거는 나중에 사장님할때 쓰삼
-          {isHistory && (
+          {/* ⭐️ 수정: isHistory와 showRating이 모두 true일 때만 별점을 표시 */}
+          {isHistory && showRating && (
             <div className="mt-4 pb-4">
               <StarRating rating={currentRating} onRate={setCurrentRating} isEditable={true} />
             </div>
-          )}*/}
+          )}
         </div>
 
         {/* 하단 액션 버튼 */}

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import ToggleTabs from "../components/ToggleTabs";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ReviewModal from "../components/ReviewModal";
@@ -22,32 +22,31 @@ interface ProfileData {
 type ReviewItem = ProfileData["pendingReviews"][number];
 
 const profileData: ProfileData = {
-  nickname: "미식한고독가",
-  userId: "#B23DSW13",
-  joinDate: "2025년 11월 15일 가입",
+  nickname: "막두날두 삼성점",
+  userId: "#B2SW133D",
+  joinDate: "2025년 11월 17일 가입",
   reviewTemperature: 65.8,
   reviewCompletionRate: 60,
   pendingReviews: [
-    { restaurantName: "KFC 종로점", visitDate: "2025년 11월 12일 방문함" },
-    { restaurantName: "맘스터치 여의도점", visitDate: "2025년 11월 12일 방문함" },
-    { restaurantName: "쉐이크쉑 청담점", visitDate: "2025년 11월 11일 방문함" },
-    { restaurantName: "맥도날드 부산점", visitDate: "2025년 11월 11일 방문함" },
+    { restaurantName: "모몽가모몽가", visitDate: "2025년 11월 12일 방문함" },
+    { restaurantName: "녜횡", visitDate: "2025년 11월 12일 방문함" },
+    { restaurantName: "영웅이", visitDate: "2025년 11월 11일 방문함" },
+    { restaurantName: "호걸이", visitDate: "2025년 11월 11일 방문함" },
 
-    { restaurantName: "이케아 광명점 푸드코트", visitDate: "2025년 11월 10일 방문함" },
-    { restaurantName: "스타벅스 리저브 을지로점", visitDate: "2025년 11월 9일 방문함" },
-    { restaurantName: "파리바게뜨 잠실점", visitDate: "2025년 11월 8일 방문함" },
+    { restaurantName: "정상화", visitDate: "2025년 11월 10일 방문함" },
+    { restaurantName: "신창섭", visitDate: "2025년 11월 9일 방문함" },
   ],
   recentReviews: [
-    { restaurantName: "맥도날드 삼성역 8번출구점", visitDate: "2025년 11월 14일 방문함" },
-    { restaurantName: "맥도날드 삼성역 8번출구점", visitDate: "2025년 11월 14일 방문함" },
-
-    { restaurantName: "버거킹 강남점", visitDate: "2025년 11월 13일 방문함" },
-    { restaurantName: "롯데리아 홍대점", visitDate: "2025년 11월 13일 방문함" },
+    { restaurantName: "캬캬캬", visitDate: "2025년 11월 8일 방문함" },
+    { restaurantName: "고독한 미식가", visitDate: "2025년 11월 14일 방문함" },
+    { restaurantName: "고독한 치와와", visitDate: "2025년 11월 14일 방문함" },
+    { restaurantName: "왈왈왈", visitDate: "2025년 11월 13일 방문함" },
+    { restaurantName: "크르르 컹컹", visitDate: "2025년 11월 13일 방문함" },
   ],
 };
 
 const ProfileScreen: React.FC = () => {
-  const { nickname, userId, joinDate, reviewTemperature, reviewCompletionRate, pendingReviews, recentReviews } = profileData;
+  const { nickname, userId, joinDate, pendingReviews, recentReviews } = profileData;
 
   const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">("pendingReview");
 
@@ -59,25 +58,6 @@ const ProfileScreen: React.FC = () => {
   } | null>(null);
 
   const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
-
-  const [currentProgress, setCurrentProgress] = useState(0);
-
-  const targetProgressWidth = `${reviewCompletionRate}%`;
-
-  const progressWidth = `${reviewCompletionRate}%`;
-
-  useEffect(() => {
-    // 100ms 지연 후 실제 완료율(reviewCompletionRate)로 설정하여 애니메이션 트리거
-    const timer = setTimeout(() => {
-      setCurrentProgress(reviewCompletionRate);
-    }, 100);
-
-    // cleanup 함수
-    return () => clearTimeout(timer);
-  }, [reviewCompletionRate]); // reviewCompletionRate가 변경될 때마다 재실행
-
-  // 진행 바 너비는 currentProgress 상태에 따라 결정
-  const animatedProgressWidth = `${currentProgress}%`;
 
   const reviewTabs = useMemo(
     () =>
@@ -125,20 +105,6 @@ const ProfileScreen: React.FC = () => {
             <span className="text-base font-semibold text-gray-900">프로필 수정</span>
           </button>
 
-          <div className="mb-4">
-            <p className="text-sm font-bold text-gray-700 text-left">리뷰온도</p>
-            <h2 className="text-4xl font-bold text-orange-600 mb-2 text-left">{reviewTemperature}°C</h2>
-            <div className="h-1.5 bg-gray-200 rounded-full ">
-              {/* 3. 애니메이션 적용: transition-all duration-1000 클래스 추가 */}
-              <div className="h-1.5 bg-orange-600 rounded-full transition-all duration-1000 ease-out" style={{ width: animatedProgressWidth }} />
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <p className="text-sm font-bold text-gray-800 text-left">리뷰 작성률 {reviewCompletionRate}%</p>
-            <p className="text-xs text-gray-500 mt-1 text-left">표시될 만큼 미식한 식당의 리뷰를 작성했어요</p>
-          </div>
-
           <div className="flex mb-5 justify-center">
             <ToggleTabs tabs={reviewTabs} activeTabId={activeTab} onTabSelect={handleTabSelect} className="mx-auto" />
           </div>
@@ -171,7 +137,7 @@ const ProfileScreen: React.FC = () => {
                   showRatingIcon={false}
                   className="mb-3"
                   // 1. Pending Review 카드 클릭 이벤트 연결
-                  onClick={() => handleCardClick(review, "pending")}
+                  onClick={() => {}}
                 />
               ))
             ) : (
@@ -199,7 +165,7 @@ const ProfileScreen: React.FC = () => {
         </div>
 
         {/* 2. ReviewModal 컴포넌트 조건부 렌더링 추가 */}
-        {modalData && <ReviewModal isOpen={isModalOpen} onClose={closeModal} reviewData={modalData.review} modalType={modalData.type} showRating={false} />}
+        {modalData && <ReviewModal isOpen={isModalOpen} onClose={closeModal} reviewData={modalData.review} modalType={modalData.type} showRating={true} />}
       </div>
     </div>
   );
