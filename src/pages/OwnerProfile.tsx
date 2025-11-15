@@ -46,9 +46,12 @@ const profileData: ProfileData = {
 };
 
 const ProfileScreen: React.FC = () => {
-  const { nickname, userId, joinDate, pendingReviews, recentReviews } = profileData;
+  const { nickname, userId, joinDate, pendingReviews, recentReviews } =
+    profileData;
 
-  const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">("pendingReview");
+  const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">(
+    "pendingReview"
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -84,16 +87,23 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <div className="h-dvh bg-white">
-      <div className="h-full flex flex-col max-w-lg mx-auto relative p-4">
+      <div className="h-full flex flex-col max-w-lg mx-auto relative p-4 mt-6">
         {/*
           주의: 이 flex-shrink-0 div에는 현재 p-4가 적용되어 있지만, 
           하단 리스트 렌더링 영역의 스크롤을 위해 p-4를 p-0으로 바꾸고 
           내부 div에 px-5를 적용하는 것이 일반적이나, 
           요청하신 부분 외는 최소한으로 수정합니다. 
         */}
-        <div className="px-5 flex-shrink-0" style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}>
+        <div
+          className="px-5 flex-shrink-0"
+          style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}
+        >
           <div className="flex items-center mb-5 text-left">
-            <img src={userAvatar} alt="User Avatar" className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover" />
+            <img
+              src={userAvatar}
+              alt="User Avatar"
+              className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover"
+            />
             <div className="justify-center">
               <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
               <p className="text-sm text-gray-500 mt-1 ">{userId}</p>
@@ -102,16 +112,26 @@ const ProfileScreen: React.FC = () => {
           </div>
 
           <button className="w-full border border-gray-900 py-2.5 rounded-md text-center mb-8 hover:bg-gray-100 transition duration-150">
-            <span className="text-base font-semibold text-gray-900">프로필 수정</span>
+            <span className="text-base font-semibold text-gray-900">
+              프로필 수정
+            </span>
           </button>
 
           <div className="flex mb-5 justify-center">
-            <ToggleTabs tabs={reviewTabs} activeTabId={activeTab} onTabSelect={handleTabSelect} className="mx-auto" />
+            <ToggleTabs
+              tabs={reviewTabs}
+              activeTabId={activeTab}
+              onTabSelect={handleTabSelect}
+              className="mx-auto"
+            />
           </div>
         </div>
 
         {/* 👇 수정된 부분: overflow-y-auto 영역에 px-5를 추가하여 리스트가 좌우 패딩을 갖도록 수정 */}
-        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}>
+        <div
+          className="flex-1 overflow-y-auto"
+          style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
+        >
           {activeTab === "reviewHistory" &&
             recentReviews.map((review, index) => (
               <RequestCardSmall
@@ -142,8 +162,12 @@ const ProfileScreen: React.FC = () => {
               ))
             ) : (
               <div className="text-center py-10 text-gray-500">
-                <p className="text-base font-semibold">작성할 리뷰가 대기 중입니다. 🍽️</p>
-                <p className="text-sm mt-1">맛있는 식사 후 리뷰를 작성해보세요!</p>
+                <p className="text-base font-semibold">
+                  작성할 리뷰가 대기 중입니다. 🍽️
+                </p>
+                <p className="text-sm mt-1">
+                  맛있는 식사 후 리뷰를 작성해보세요!
+                </p>
               </div>
             ))}
         </div>
@@ -165,7 +189,15 @@ const ProfileScreen: React.FC = () => {
         </div>
 
         {/* 2. ReviewModal 컴포넌트 조건부 렌더링 추가 */}
-        {modalData && <ReviewModal isOpen={isModalOpen} onClose={closeModal} reviewData={modalData.review} modalType={modalData.type} showRating={true} />}
+        {modalData && (
+          <ReviewModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            reviewData={modalData.review}
+            modalType={modalData.type}
+            showRating={true}
+          />
+        )}
       </div>
     </div>
   );
