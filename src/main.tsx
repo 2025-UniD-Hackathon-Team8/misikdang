@@ -1,10 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import RegisterMenu_1 from './pages/registerMenu_1.tsx'
+import RegisterMenu_3 from './pages/RegisterMenu_3.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RegisterMenu_1 />
+    <RegisterMenu_3/>
   </StrictMode>,
 )
