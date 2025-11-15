@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import ToggleTabs from "../components/ToggleTabs";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ReviewModal from "../components/ReviewModal";
@@ -58,9 +58,26 @@ const ProfileScreen: React.FC = () => {
     type: "pending" | "history";
   } | null>(null);
 
+  const [currentProgress, setCurrentProgress] = useState(0);
+
+  const targetProgressWidth = `${reviewCompletionRate}%`;
+
   const userAvatar = "https://via.placeholder.com/100/ff4500/ffffff?text=Mr+K";
 
   const progressWidth = `${reviewCompletionRate}%`;
+
+  useEffect(() => {
+    // 100ms 지연 후 실제 완료율(reviewCompletionRate)로 설정하여 애니메이션 트리거
+    const timer = setTimeout(() => {
+      setCurrentProgress(reviewCompletionRate);
+    }, 100);
+
+    // cleanup 함수
+    return () => clearTimeout(timer);
+  }, [reviewCompletionRate]); // reviewCompletionRate가 변경될 때마다 재실행
+
+  // 진행 바 너비는 currentProgress 상태에 따라 결정
+  const animatedProgressWidth = `${currentProgress}%`;
 
   const reviewTabs = useMemo(
     () =>
@@ -112,7 +129,8 @@ const ProfileScreen: React.FC = () => {
             <p className="text-sm font-bold text-gray-700 text-left">리뷰온도</p>
             <h2 className="text-4xl font-bold text-orange-600 mb-2 text-left">{reviewTemperature}°C</h2>
             <div className="h-1.5 bg-gray-200 rounded-full ">
-              <div className="h-1.5 bg-orange-600 rounded-full" style={{ width: progressWidth }} />
+              {/* 3. 애니메이션 적용: transition-all duration-1000 클래스 추가 */}
+              <div className="h-1.5 bg-orange-600 rounded-full transition-all duration-1000 ease-out" style={{ width: animatedProgressWidth }} />
             </div>
           </div>
 
