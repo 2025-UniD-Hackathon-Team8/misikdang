@@ -1,6 +1,18 @@
 import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+
+const ReactCompilerConfig = {
+  /* ... */
+};
 
 export default defineConfig({
-  plugins: [tailwindcss()],
+  plugins: [
+    react({
+      babel: {
+        plugins: [["babel-plugin-react-compiler", ReactCompilerConfig]],
+      },
+    }),
+    tailwindcss(),
+  ],
 });
