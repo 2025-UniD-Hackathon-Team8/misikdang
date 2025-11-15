@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import FoodCard from "../components/FoodCard";
 import CategoryCard from "../components/CategoryCard";
+import TutorialCard from "../components/TutorialCard";
 import ApplyButton from "../components/ApplyButton";
 import EndCard from "../components/EndCard";
 import { colors } from "../constants/colors";
@@ -8,7 +9,7 @@ import { foodCategories, foodItems } from "../data/mockData";
 import { useImageColor } from "../hooks/useImageColor";
 
 export default function Home() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(-1); // -1로 시작하여 튜토리얼 카드 표시
   const [bgColor, setBgColor] = useState("#FFB682");
   const [logoColor, setLogoColor] = useState<string>(colors.primary);
 
@@ -75,83 +76,93 @@ export default function Home() {
       </div>
 
       <div className="relative" style={{ height: "520px" }}>
-        {/* 배경 카드들 (뒤에서부터) */}
-        {[2, 1].map((offset) => {
-          const index = currentIndex + offset;
-          if (index < allCards.length) {
-            const card = allCards[index];
-            if (card.type === "category") {
-              return (
-                <CategoryCard
-                  key={`bg-${index}`}
-                  {...card}
-                  index={offset}
-                  totalCards={3}
-                />
-              );
-            } else {
-              return (
-                <FoodCard
-                  key={`bg-${index}`}
-                  {...card}
-                  index={offset}
-                  totalCards={3}
-                >
-                  <ApplyButton
-                    bgColor={colors.primary}
-                    fgColor={colors.secondary}
-                    className="w-full py-2 text-base font-bold rounded-2xl"
-                    discount={card.discount}
-                  >
-                    미식 신청하기
-                  </ApplyButton>
-                </FoodCard>
-              );
-            }
-          }
-          return null;
-        })}
-
-        {/* 현재 카드 */}
-        {currentIndex < allCards.length ? (
-          (() => {
-            const currentCard = allCards[currentIndex];
-            if (currentCard.type === "category") {
-              return (
-                <CategoryCard
-                  key={`current-${currentIndex}`}
-                  {...currentCard}
-                  onSwipeRight={handleSwipeRight}
-                  onSwipeLeft={handleSwipeLeft}
-                  index={0}
-                  totalCards={3}
-                />
-              );
-            } else {
-              return (
-                <FoodCard
-                  key={`current-${currentIndex}`}
-                  {...currentCard}
-                  onSwipeRight={handleSwipeRight}
-                  onSwipeLeft={handleSwipeLeft}
-                  index={0}
-                  totalCards={3}
-                >
-                  <ApplyButton
-                    bgColor={colors.primary}
-                    fgColor={colors.secondary}
-                    className="w-full py-2 text-base font-bold rounded-2xl"
-                    discount={currentCard.discount}
-                  >
-                    미식 신청하기
-                  </ApplyButton>
-                </FoodCard>
-              );
-            }
-          })()
+        {/* 튜토리얼 카드 */}
+        {currentIndex === -1 ? (
+          <TutorialCard
+            onSwipeRight={handleSwipeRight}
+            onSwipeLeft={handleSwipeLeft}
+          />
         ) : (
-          /* 마지막 카드 */
-          <EndCard onReset={() => setCurrentIndex(0)} />
+          <>
+            {/* 배경 카드들 (뒤에서부터) */}
+            {[2, 1].map((offset) => {
+              const index = currentIndex + offset;
+              if (index < allCards.length) {
+                const card = allCards[index];
+                if (card.type === "category") {
+                  return (
+                    <CategoryCard
+                      key={`bg-${index}`}
+                      {...card}
+                      index={offset}
+                      totalCards={3}
+                    />
+                  );
+                } else {
+                  return (
+                    <FoodCard
+                      key={`bg-${index}`}
+                      {...card}
+                      index={offset}
+                      totalCards={3}
+                    >
+                      <ApplyButton
+                        bgColor={colors.primary}
+                        fgColor={colors.secondary}
+                        className="w-full py-2 text-base font-bold rounded-2xl"
+                        discount={card.discount}
+                      >
+                        미식 신청하기
+                      </ApplyButton>
+                    </FoodCard>
+                  );
+                }
+              }
+              return null;
+            })}
+
+            {/* 현재 카드 */}
+            {currentIndex < allCards.length ? (
+              (() => {
+                const currentCard = allCards[currentIndex];
+                if (currentCard.type === "category") {
+                  return (
+                    <CategoryCard
+                      key={`current-${currentIndex}`}
+                      {...currentCard}
+                      onSwipeRight={handleSwipeRight}
+                      onSwipeLeft={handleSwipeLeft}
+                      index={0}
+                      totalCards={3}
+                    />
+                  );
+                } else {
+                  return (
+                    <FoodCard
+                      key={`current-${currentIndex}`}
+                      {...currentCard}
+                      onSwipeRight={handleSwipeRight}
+                      onSwipeLeft={handleSwipeLeft}
+                      index={0}
+                      totalCards={3}
+                    >
+                      <ApplyButton
+                        bgColor={colors.primary}
+                        fgColor={colors.secondary}
+                        className="w-full py-2 text-base font-bold rounded-2xl"
+                        discount={currentCard.discount}
+                      >
+                        미식 신청하기
+                      </ApplyButton>
+                    </FoodCard>
+                  );
+                }
+              })()
+            ) : (
+              /* 마지막 카드 */
+              <EndCard onReset={() => setCurrentIndex(-1)} />
+            )}
+          </>
         )}
       </div>
     </div>

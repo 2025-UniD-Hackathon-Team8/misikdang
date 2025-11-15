@@ -53,7 +53,10 @@ function App() {
   let content: ReactNode;
   if (currentPage === "onboarding") {
     content = (
-      <OnboardingPage onStartChef={handleStartChef} onStartGourmet={handleStartGourmet} />
+      <OnboardingPage
+        onStartChef={handleStartChef}
+        onStartGourmet={handleStartGourmet}
+      />
     );
   } else if (currentPage === "owner-registered-menu") {
     content = <OwnerRegisteredMenuPage />;
@@ -64,7 +67,6 @@ function App() {
   } else {
     content = (
       <>
-        <Header />
         <Home />
       </>
     );
@@ -72,6 +74,8 @@ function App() {
 
   return (
     <>
+      <Header />
+      {content}
       {showBottomNav && (
         <BottomNav
           onLeftClick={handleNavLeft}
@@ -79,7 +83,6 @@ function App() {
           onRightClick={handleNotImplemented}
         />
       )}
-      {content}
     </>
   );
 }
