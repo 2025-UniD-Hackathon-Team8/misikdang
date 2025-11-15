@@ -5,6 +5,7 @@ const PRONUNCIATION_TEXT = "미·식당";
 
 type OnboardingPageProps = {
   onStartChef: () => void;
+  onStartGourmet: () => void;
 };
 
 function SplashBrandMark() {
@@ -33,7 +34,7 @@ function MainBrandMark() {
   );
 }
 
-export default function OnboardingPage({ onStartChef }: OnboardingPageProps) {
+export default function OnboardingPage({ onStartChef, onStartGourmet }: OnboardingPageProps) {
   const [showMainContent, setShowMainContent] = useState(false);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function OnboardingPage({ onStartChef }: OnboardingPageProps) {
   }, []);
 
   const handleGourmetStart = () => {
-    alert("미식가로 시작하기 기능은 아직 구현되지 않았습니다.");
+    onStartGourmet();
   };
 
   const baseButtonClass =

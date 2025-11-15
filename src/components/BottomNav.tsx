@@ -1,17 +1,23 @@
+type BottomNavProps = {
+  onLeftClick: () => void;
+  onMiddleClick: () => void;
+  onRightClick: () => void;
+};
+
+const buttonBaseClass = "flex h-10 w-10 items-center justify-center";
 const iconButtonProps = {
   type: "button" as const,
 };
 
-function BottomNav() {
+function BottomNav({ onLeftClick, onMiddleClick, onRightClick }: BottomNavProps) {
   return (
-    <div className="fixed bottom-0 left-0 w-full flex justify-center bg-transparent">
+    <div className="fixed bottom-0 left-0 z-50 w-full flex justify-center bg-transparent">
       <div className="inline-flex w-[393px] h-[60px] pl-[65px] pr-[64px] py-4 justify-center items-center gap-[92px] bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.10)]">
         <button
           {...iconButtonProps}
-          onClick={() => {
-            // TODO: connect to navigation after designs are finalized
-            console.log("Left icon pressed");
-          }}
+          className={buttonBaseClass}
+          aria-label="홈으로 이동"
+          onClick={onLeftClick}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="26" height="28" viewBox="0 0 26 28" fill="none">
             <path
@@ -22,9 +28,9 @@ function BottomNav() {
         </button>
         <button
           {...iconButtonProps}
-          onClick={() => {
-            console.log("Middle icon pressed");
-          }}
+          className={buttonBaseClass}
+          aria-label="요청 내역으로 이동"
+          onClick={onMiddleClick}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="28" height="22" viewBox="0 0 28 22" fill="none">
             <path
@@ -35,9 +41,9 @@ function BottomNav() {
         </button>
         <button
           {...iconButtonProps}
-          onClick={() => {
-            console.log("Right icon pressed");
-          }}
+          className={buttonBaseClass}
+          aria-label="추가 기능"
+          onClick={onRightClick}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
             <path
