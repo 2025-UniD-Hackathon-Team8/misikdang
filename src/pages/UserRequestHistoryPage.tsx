@@ -50,11 +50,14 @@ const REQUESTS: RequestItem[] = [
 ] as const;
 
 export default function UserRequestHistoryPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("sent");
+  const [activeTab, setActiveTab] = useState<TabId>("received");
   const [requests, setRequests] = useState<RequestItem[]>(REQUESTS);
 
   const visibleRequests = useMemo(
-    () => requests.filter((request) => request.type === activeTab),
+    () =>
+      requests.filter((request) =>
+        activeTab === "received" ? request.type === "received" : request.type === "sent",
+      ),
     [activeTab, requests],
   );
 
@@ -103,6 +106,7 @@ export default function UserRequestHistoryPage() {
                     subtitle={request.subtitle}
                     thumbnailColor={request.thumbnail}
                     onClose={() => handleRemoveRequest(request.id)}
+                    onClick={() => console.log("clicked")}
                   />
                 )}
               </div>

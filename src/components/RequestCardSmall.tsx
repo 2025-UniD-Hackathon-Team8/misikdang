@@ -8,6 +8,8 @@ interface RequestCardSmallProps {
   subtitleIcon?: ReactNode;
   onClose?: () => void;
   className?: string;
+
+  onClick: () => void;
 }
 
 const DefaultRatingIcon = () => (
@@ -27,10 +29,12 @@ export default function RequestCardSmall({
   subtitleIcon,
   onClose,
   className = "",
+  onClick,
 }: RequestCardSmallProps) {
   return (
     <article
-      className={`flex h-[77px] w-[345px] items-center gap-4 rounded-[10px] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.06)] ${className}`}
+      className={`flex h-[77px] w-[345px] items-center gap-4 rounded-[10px] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.06)] ${className} cursor-pointer`}
+      onClick={onClick}
     >
       <div className="h-[45px] w-[45px] rounded-[10px]" style={{ backgroundColor: thumbnailColor }} />
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -43,8 +47,11 @@ export default function RequestCardSmall({
       {onClose && (
         <button
           type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onClose();
+          }}
           className="text-xl text-[#cccccc] transition hover:text-[var(--color-gray-2)]"
-          onClick={onClose}
           aria-label={`${title} 카드 닫기`}
         >
           ×

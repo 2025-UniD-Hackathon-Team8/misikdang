@@ -8,17 +8,25 @@ import UserRequestHistoryPage from "./pages/UserRequestHistoryPage";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
+import Profile from "./pages/Profile";
+import OwnerProfile from "./pages/OwnerProfile";
 
 type PageKey =
   | "home"
   | "onboarding"
   | "owner-registered-menu"
   | "user-request-history"
-  | "owner-request-history";
+  | "owner-request-history"
+  | "profile"
+  | "owner-profile";
 type UserMode = "gourmet" | "chef" | null;
 
-function App() {
-  const [currentPage, setCurrentPage] = useState<PageKey>("onboarding");
+type AppProps = {
+  initialPage?: PageKey;
+};
+
+function App({ initialPage = "onboarding" }: AppProps) {
+  const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
   const [userMode, setUserMode] = useState<UserMode>(null);
   const showBottomNav = currentPage !== "onboarding";
 
@@ -31,7 +39,13 @@ function App() {
     setCurrentPage("home");
   };
   const handleNotImplemented = () => {
-    alert("해당 기능은 아직 구현되지 않았습니다.");
+    if (userMode === "gourmet") {
+      setCurrentPage("profile");
+    } else if (userMode === "chef") {
+      setCurrentPage("owner-profile");
+    } else {
+      alert("사용자 모드를 먼저 선택하세요.");
+    }
   };
 
   const handleNavLeft = () => {
@@ -61,6 +75,10 @@ function App() {
     content = <UserRequestHistoryPage />;
   } else if (currentPage === "owner-request-history") {
     content = <OwnerRequestHistoryPage />;
+  } else if (currentPage === "profile") {
+    content = <Profile />;
+  } else if (currentPage === "owner-profile") {
+    content = <OwnerProfile />;
   } else {
     content = (
       <>

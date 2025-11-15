@@ -109,6 +109,7 @@ export default function OwnerRequestHistoryPage() {
                     thumbnailColor={request.thumbnail}
                     showRatingIcon={false}
                     onClose={() => handleRemoveRequest(request.id)}
+                    onClick={() => console.log("clicked")}
                   />
                 )}
               </div>
