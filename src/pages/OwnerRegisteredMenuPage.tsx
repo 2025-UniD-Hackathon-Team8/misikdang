@@ -8,7 +8,10 @@ import {
   sendRequestToGourmet,
   getOwnerProfile,
 } from "../utils/localStorage";
-import { getMenusList, type StoredMenuListItem } from "../utils/menuDataManager";
+import {
+  getMenusList,
+  type StoredMenuListItem,
+} from "../utils/menuDataManager";
 
 type MenuItem = {
   id: string;
@@ -33,6 +36,7 @@ type TabId = (typeof TABS)[number]["id"];
 
 export default function OwnerRegisteredMenuPage() {
   const [activeTab, setActiveTab] = useState<TabId>("category");
+  const [isAnimating, setIsAnimating] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [submenuItems, setSubmenuItems] = useState<StoredMenuListItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<MenuItem | null>(
@@ -69,6 +73,14 @@ export default function OwnerRegisteredMenuPage() {
       setSelectedSubmenu(null);
     }
   }, [activeTab]);
+
+  const handleTabChange = (tabId: string) => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setActiveTab(tabId as TabId);
+      setIsAnimating(false);
+    }, 150);
+  };
 
   const loadMenuData = () => {
     const storedMenus = getOwnerMenus();
@@ -132,7 +144,7 @@ export default function OwnerRegisteredMenuPage() {
   };
 
   return (
-    <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
+    <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-2 text-left">
       <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-24 pt-[125px]">
         <h1 className="self-start text-2xl font-semibold text-[var(--color-primary)]">
           등록한 메뉴
@@ -141,12 +153,18 @@ export default function OwnerRegisteredMenuPage() {
         <ToggleTabs
           tabs={TABS}
           activeTabId={activeTab}
-          onTabSelect={(id) => setActiveTab(id as TabId)}
+          onTabSelect={handleTabChange}
           className="self-start"
         />
 
         {activeTab === "category" ? (
-          <div className="flex w-full flex-col items-center gap-[15px]">
+          <div
+            className={`flex w-full flex-col items-center gap-[15px] transition-all duration-300 ${
+              isAnimating
+                ? "opacity-0 translate-y-2"
+                : "opacity-100 translate-y-0"
+            }`}
+          >
             {menuItems.map((menu) => {
               const commentCount = commentsMap[menu.name]?.length ?? 0;
               const isActive = selectedCategory?.id === menu.id;
@@ -155,9 +173,7 @@ export default function OwnerRegisteredMenuPage() {
                   key={menu.id}
                   type="button"
                   className={`flex h-[75px] w-[345px] items-center gap-4 rounded-[10px] px-4 text-left shadow-[0_8px_20px_rgba(0,0,0,0.05)] ${
-                    isActive
-                      ? "bg-[var(--color-secondary)]"
-                      : "bg-white"
+                    isActive ? "bg-[var(--color-secondary)]" : "bg-white"
                   }`}
                   onClick={() => setSelectedCategory(menu)}
                 >
@@ -178,7 +194,7 @@ export default function OwnerRegisteredMenuPage() {
             })}
 
             {selectedCategory && (
-              <div className="flex w-full flex-col items-center gap-[12px]">
+              <div className="flex w-full flex-col items-center gap-[12px] animate-[fadeIn_0.4s_ease-out]">
                 <div className="self-start">
                   <h2 className="text-xl font-semibold text-[var(--color-primary)]">
                     {selectedCategory.name} 테스트 후보
@@ -189,9 +205,16 @@ export default function OwnerRegisteredMenuPage() {
                     아직 코멘트가 없어요.
                   </p>
                 )}
-                {commentsMap[selectedCategory.name]?.map((comment) => (
+                {commentsMap[selectedCategory.name]?.map((comment, index) => (
                   <RequestCardLarge
                     key={comment.id}
+                    className="animate-[slideIn_0.4s_ease-out] opacity-0"
+                    style={
+                      {
+                        animationDelay: `${index * 0.1}s`,
+                        animationFillMode: "forwards",
+                      } as React.CSSProperties
+                    }
                     title={comment.nickname}
                     subtitle={`리뷰온도 ${comment.temperature.toFixed(1)} ℃`}
                     thumbnailColor={comment.thumbnail}
@@ -250,7 +273,13 @@ export default function OwnerRegisteredMenuPage() {
             )}
           </div>
         ) : (
-          <div className="flex w-full flex-col items-center gap-[15px]">
+          <div
+            className={`flex w-full flex-col items-center gap-[15px] transition-all duration-300 ${
+              isAnimating
+                ? "opacity-0 translate-y-2"
+                : "opacity-100 translate-y-0"
+            }`}
+          >
             {submenuItems.map((menu) => {
               const commentCount = commentsMap[menu.name]?.length ?? 0;
               const isActive = selectedSubmenu?.id === menu.id;
@@ -259,9 +288,7 @@ export default function OwnerRegisteredMenuPage() {
                   key={menu.id}
                   type="button"
                   className={`flex h-[75px] w-[345px] items-center gap-4 rounded-[10px] px-4 text-left shadow-[0_8px_20px_rgba(0,0,0,0.05)] ${
-                    isActive
-                      ? "bg-[var(--color-secondary)]"
-                      : "bg-white"
+                    isActive ? "bg-[var(--color-secondary)]" : "bg-white"
                   }`}
                   onClick={() => setSelectedSubmenu(menu)}
                 >
@@ -290,7 +317,7 @@ export default function OwnerRegisteredMenuPage() {
             </button>
 
             {selectedSubmenu && (
-              <div className="flex w-full flex-col items-center gap-[12px]">
+              <div className="flex w-full flex-col items-center gap-[12px] animate-[fadeIn_0.4s_ease-out]">
                 <div className="self-start">
                   <h2 className="text-xl font-semibold text-[var(--color-primary)]">
                     {selectedSubmenu.name} 테스트 후보
@@ -302,9 +329,16 @@ export default function OwnerRegisteredMenuPage() {
                     아직 코멘트가 없어요.
                   </p>
                 )}
-                {commentsMap[selectedSubmenu.name]?.map((comment) => (
+                {commentsMap[selectedSubmenu.name]?.map((comment, index) => (
                   <RequestCardLarge
                     key={comment.id}
+                    className="animate-[slideIn_0.4s_ease-out] opacity-0"
+                    style={
+                      {
+                        animationDelay: `${index * 0.1}s`,
+                        animationFillMode: "forwards",
+                      } as React.CSSProperties
+                    }
                     title={comment.nickname}
                     subtitle={`리뷰온도 ${comment.temperature.toFixed(1)} ℃`}
                     thumbnailColor={comment.thumbnail}

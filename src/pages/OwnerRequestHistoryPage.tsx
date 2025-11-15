@@ -28,6 +28,7 @@ const DEFAULT_TAB: TabId = "sent";
 
 export default function OwnerRequestHistoryPage() {
   const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [requests, setRequests] = useState<RequestItem[]>([]);
   const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(
     () => new Set()
@@ -60,6 +61,14 @@ export default function OwnerRequestHistoryPage() {
     setShowAcceptModal(true);
   };
 
+  const handleTabChange = (tabId: string) => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setActiveTab(tabId as TabId);
+      setIsAnimating(false);
+    }, 150);
+  };
+
   return (
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
       <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-10 pt-[111px]">
@@ -71,10 +80,16 @@ export default function OwnerRequestHistoryPage() {
         <ToggleTabs
           tabs={TABS}
           activeTabId={activeTab}
-          onTabSelect={(id) => setActiveTab(id as TabId)}
+          onTabSelect={handleTabChange}
         />
 
-        <div className="flex flex-col items-center gap-[15px]">
+        <div
+          className={`flex flex-col items-center gap-[15px] transition-all duration-300 ${
+            isAnimating
+              ? "opacity-0 translate-y-2"
+              : "opacity-100 translate-y-0"
+          }`}
+        >
           {visibleRequests.map((request) => {
             const isReceived = request.type === "received";
             const isAccepted = acceptedRequests.has(request.id);

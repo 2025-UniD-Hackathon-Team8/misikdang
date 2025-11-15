@@ -89,7 +89,7 @@ export default function Home() {
 
   return (
     <div
-      className="w-full min-h-screen transition-all duration-700 ease-in-out"
+      className="w-full min-h-screen"
       style={{
         background: `linear-gradient(180deg, ${bgColor} 0%, ${bgColor} 20%, #fcfcfc 47%, #fcfcfc 100%)`,
       }}

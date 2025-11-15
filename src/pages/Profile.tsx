@@ -30,6 +30,8 @@ const ProfileScreen: React.FC = () => {
     "pendingReview"
   );
 
+  const [isAnimating, setIsAnimating] = useState(false);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [modalData, setModalData] = useState<{
@@ -68,7 +70,11 @@ const ProfileScreen: React.FC = () => {
   );
 
   const handleTabSelect = (id: string) => {
-    setActiveTab(id as "pendingReview" | "reviewHistory");
+    setIsAnimating(true);
+    setTimeout(() => {
+      setActiveTab(id as "pendingReview" | "reviewHistory");
+      setIsAnimating(false);
+    }, 150);
   };
 
   const handleCardClick = (review: ReviewItem, type: "pending" | "history") => {
@@ -150,7 +156,11 @@ const ProfileScreen: React.FC = () => {
 
         {/* 👇 수정된 부분: overflow-y-auto 영역에 px-5를 추가하여 리스트가 좌우 패딩을 갖도록 수정 */}
         <div
-          className="flex-1 overflow-y-auto"
+          className={`flex-1 overflow-y-auto transition-all duration-300 ${
+            isAnimating
+              ? "opacity-0 translate-y-2"
+              : "opacity-100 translate-y-0"
+          }`}
           style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
         >
           {activeTab === "reviewHistory" &&
