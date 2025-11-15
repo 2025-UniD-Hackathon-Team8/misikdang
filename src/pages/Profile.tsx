@@ -41,11 +41,9 @@ const ProfileScreen: React.FC = () => {
 
   const [currentProgress, setCurrentProgress] = useState(0);
 
-  // 프로필 업데이트 함수 (필요시 사용)
-  const updateProfile = (updates: Partial<ProfileData>) => {
-    const updatedProfile = { ...profileData, ...updates };
-    setGourmetProfile(updatedProfile);
-  };
+  //const targetProgressWidth = `${reviewCompletionRate}%`;
+
+  //const progressWidth = `${reviewCompletionRate}%`;
 
   useEffect(() => {
     // 100ms 지연 후 실제 완료율(reviewCompletionRate)로 설정하여 애니메이션 트리거

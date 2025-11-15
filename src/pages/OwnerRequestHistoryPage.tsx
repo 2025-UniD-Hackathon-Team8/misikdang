@@ -19,43 +19,14 @@ type RequestItem = {
   thumbnail: string;
 };
 
-const REQUESTS: RequestItem[] = [
-  {
-    id: "sent-1",
-    type: "sent",
-    title: "고독한 미식가",
-    subtitle: "리뷰온도 50℃",
-    thumbnail: "#e3ddff",
-  },
-  {
-    id: "received-1",
-    type: "received",
-    title: "모몽가모몽가",
-    subtitle: "리뷰온도 50℃",
-    thumbnail: "#ffe1e0",
-  },
-  {
-    id: "received-2",
-    type: "received",
-    title: "푸드파이터",
-    subtitle: "리뷰온도 50℃",
-    thumbnail: "#ffecc1",
-  },
-  {
-    id: "received-3",
-    type: "received",
-    title: "야식 뭐가 좋을까?",
-    subtitle: "리뷰온도 50℃",
-    thumbnail: "#cdf2ff",
-  },
-] as const;
-
 const DEFAULT_TAB: TabId = "sent";
 
 export default function OwnerRequestHistoryPage() {
   const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
-  const [requests, setRequests] = useState<RequestItem[]>(REQUESTS);
-  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(() => new Set());
+  const [requests, setRequests] = useState<RequestItem[]>([]);
+  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(
+    () => new Set()
+  );
   const [showAcceptModal, setShowAcceptModal] = useState(false);
 
   const visibleRequests = useMemo(
@@ -146,7 +117,10 @@ export default function OwnerRequestHistoryPage() {
         </div>
       </main>
       {showAcceptModal && (
-        <AcceptModal message="수락되었습니다!" onClose={() => setShowAcceptModal(false)} />
+        <AcceptModal
+          message="수락되었습니다!"
+          onClose={() => setShowAcceptModal(false)}
+        />
       )}
     </div>
   );

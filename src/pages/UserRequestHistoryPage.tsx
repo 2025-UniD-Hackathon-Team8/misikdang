@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import AcceptModal from "../components/AcceptModal";
 import RequestCardLarge from "../components/RequestCardLarge";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ToggleTabs from "../components/ToggleTabs";
+import { getGourmetRequests } from "../utils/localStorage";
 
 const TABS = [
   { id: "sent", label: "내가 한 요청" },
@@ -19,49 +20,28 @@ type RequestItem = {
   thumbnail: string;
 };
 
-const REQUESTS: RequestItem[] = [
-  {
-    id: "received-1",
-    type: "received",
-    title: "점심 추천 부탁!",
-    subtitle: "4.9(343) 1.7km",
-    thumbnail: "#ffe1e0",
-  },
-  {
-    id: "received-2",
-    type: "received",
-    title: "단체 예약 가능?",
-    subtitle: "4.9(343) 1.7km",
-    thumbnail: "#ffecc1",
-  },
-  {
-    id: "received-3",
-    type: "received",
-    title: "야식 뭐가 좋을까?",
-    subtitle: "4.9(343) 1.7km",
-    thumbnail: "#cdf2ff",
-  },
-  {
-    id: "sent-1",
-    type: "sent",
-    title: "예약 확인 요청",
-    subtitle: "4.9(343) 1.7km",
-    thumbnail: "#e3ddff",
-  },
-] as const;
-
 export default function UserRequestHistoryPage() {
   const [activeTab, setActiveTab] = useState<TabId>("sent");
-  const [requests, setRequests] = useState<RequestItem[]>(REQUESTS);
-  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(() => new Set());
+  const [requests, setRequests] = useState<RequestItem[]>([]);
+  const [acceptedRequests, setAcceptedRequests] = useState<Set<string>>(
+    () => new Set()
+  );
   const [showAcceptModal, setShowAcceptModal] = useState(false);
+
+  // localStorage에서 받은 요청 로드
+  useEffect(() => {
+    const storedRequests = getGourmetRequests();
+    setRequests(storedRequests);
+  }, []);
 
   const visibleRequests = useMemo(
     () =>
       requests.filter((request) =>
-        activeTab === "received" ? request.type === "received" : request.type === "sent",
+        activeTab === "received"
+          ? request.type === "received"
+          : request.type === "sent"
       ),
-    [activeTab, requests],
+    [activeTab, requests]
   );
 
   const handleRemoveRequest = (requestId: string) => {
@@ -134,12 +114,17 @@ export default function UserRequestHistoryPage() {
             );
           })}
           {visibleRequests.length === 0 && (
-            <p className="text-sm text-[var(--color-gray-2)]">표시할 요청이 아직 없어요.</p>
+            <p className="text-sm text-[var(--color-gray-2)]">
+              표시할 요청이 아직 없어요.
+            </p>
           )}
         </div>
       </main>
       {showAcceptModal && (
-        <AcceptModal message="수락되었습니다!" onClose={() => setShowAcceptModal(false)} />
+        <AcceptModal
+          message="수락되었습니다!"
+          onClose={() => setShowAcceptModal(false)}
+        />
       )}
     </div>
   );

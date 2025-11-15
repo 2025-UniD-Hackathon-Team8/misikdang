@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import RequestCardLarge from "../components/RequestCardLarge";
-import { getOwnerMenus, getCandidatesByCategory } from "../utils/localStorage";
+import {
+  getOwnerMenus,
+  getCandidatesByCategory,
+  sendRequestToGourmet,
+  getOwnerProfile,
+} from "../utils/localStorage";
 
 type MenuItem = {
   id: string;
@@ -45,7 +50,6 @@ export default function OwnerRegisteredMenuPage() {
     const newCommentsMap: Record<string, CommentItem[]> = {};
     storedMenus.forEach((menu: MenuItem) => {
       const candidates = getCandidatesByCategory(menu.name);
-      console.log(`[${menu.name}] 후보 수:`, candidates.length, candidates);
       newCommentsMap[menu.name] = candidates.map((c: any) => ({
         id: c.id,
         nickname: c.nickname,
@@ -58,7 +62,6 @@ export default function OwnerRegisteredMenuPage() {
 
   const loadCandidates = (categoryName: string) => {
     const candidates = getCandidatesByCategory(categoryName);
-    console.log(`[${categoryName}] 선택된 메뉴의 후보:`, candidates);
     setCommentsMap((prev) => ({
       ...prev,
       [categoryName]: candidates.map((c: any) => ({
@@ -208,9 +211,26 @@ export default function OwnerRegisteredMenuPage() {
                     label: "요청보내기",
                     onClick: (event) => {
                       event.stopPropagation();
-                      alert(
-                        `${comment.nickname}님의 리뷰를 기반으로 요청을 보낼 예정입니다.`
-                      );
+
+                      // owner 정보 가져오기
+                      const ownerProfile = getOwnerProfile();
+                      if (ownerProfile && selectedMenu) {
+                        // gourmet에게 요청 보내기
+                        sendRequestToGourmet(
+                          comment.nickname,
+                          selectedMenu.name,
+                          {
+                            name: ownerProfile.nickname || "음식점",
+                            rating: 4.9,
+                            reviewCount: 343,
+                            distance: "1.7km",
+                          }
+                        );
+
+                        alert(`${comment.nickname}님에게 요청을 보냈습니다!`);
+                      } else {
+                        alert("요청을 보내려면 owner 프로필이 필요합니다.");
+                      }
                     },
                   }}
                 />

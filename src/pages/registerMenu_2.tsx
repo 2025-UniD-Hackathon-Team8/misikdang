@@ -5,7 +5,7 @@ import Button from "../components/Button.tsx";
 import TopNavigator from "../components/TopNavigator.tsx"; 
 //import TabBar from "./components/TabBar"; 
 import { colors } from "../constants/colors.ts"; 
-import { getMenuData, saveMenuData, validateStep2 } from "../utils/menuDataManager.ts";
+import { getMenuData, saveMenuData, validateStep2} from "../utils/menuDataManager.ts";
 
 const discountOptions = ["10%", "20%", "30%", "무료"];
 
@@ -19,6 +19,7 @@ export default function RegisterMenu1() {
 
   // Load existing data on mount
   useEffect(() => {
+
     const savedData = getMenuData();
     setMenuName(savedData.menuName);
     setMenuPrice(savedData.menuPrice);
@@ -36,6 +37,9 @@ export default function RegisterMenu1() {
 
   const handleBack = async () => {
     try {
+      // Clear stored menu data so that when user goes back to the very first
+      // step (step 1) all inputs are clean.
+
       const mod = await import("./registerMenu_1");
       const Page = mod && mod.default ? mod.default : null;
       const root = document.getElementById("root");

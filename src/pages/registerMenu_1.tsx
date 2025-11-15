@@ -6,7 +6,7 @@ import Button from "../components/Button.tsx";
 import TopNavigator from "../components/TopNavigator.tsx"; 
 //import TabBar from "./components/TabBar"; 
 import { colors } from "../constants/colors.ts"; 
-import { getMenuData, saveMenuData, validateStep1 } from "../utils/menuDataManager.ts";
+import { getMenuData, saveMenuData, validateStep1, clearMenuData } from "../utils/menuDataManager.ts";
 
 
 export default function RegisterMenu1() {
@@ -16,8 +16,27 @@ export default function RegisterMenu1() {
   const [error, setError] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [currentProgress, setCurrentProgress] = useState(0);
-  // Load existing data on mount
+  // Load existing data on mount. If this is a full page reload, clear stored
+  // data first so inputs are refreshed on reload.
   useEffect(() => {
+    const isReload = (() => {
+      try {
+        const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[] | undefined;
+        if (navEntries && navEntries.length > 0) {
+          return navEntries[0].type === "reload";
+        }
+        const nav = (performance as unknown as { navigation?: { type?: number } }).navigation;
+        return !!(nav && nav.type === 1); // TYPE_RELOAD
+      } catch {
+        return false;
+      }
+    })();
+
+    if (isReload) {
+      clearMenuData();
+      return;
+    }
+
     const savedData = getMenuData();
     if (savedData.location) {
       setLocation(savedData.location);

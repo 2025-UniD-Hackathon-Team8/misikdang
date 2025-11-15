@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   GOURMET_PROFILE: "misikdang_gourmet_profile",
   OWNER_PROFILE: "misikdang_owner_profile",
   CATEGORY_CANDIDATES: "misikdang_category_candidates", // owner가 올린 메뉴별 테스트 후보 (gourmet가 오른쪽 스와이프한 사용자들)
+  GOURMET_REQUESTS: "misikdang_gourmet_requests", // gourmet가 받은 요청 목록
 } as const;
 
 // 제네릭 localStorage 저장 함수
@@ -112,7 +113,15 @@ export function setGourmetProfile(profile: any) {
 }
 
 export function getOwnerProfile() {
-  return getLocalStorage(STORAGE_KEYS.OWNER_PROFILE, null);
+  return getLocalStorage(STORAGE_KEYS.OWNER_PROFILE, null) as {
+    nickname: string;
+    userId: string;
+    joinDate: string;
+    reviewTemperature: number;
+    reviewCompletionRate: number;
+    pendingReviews: { restaurantName: string; visitDate: string }[];
+    recentReviews: { restaurantName: string; visitDate: string }[];
+  } | null;
 }
 
 export function setOwnerProfile(profile: any) {
@@ -160,7 +169,6 @@ export function addCategoryCandidate(
   userInfo: { nickname: string; temperature: number }
 ) {
   const candidates = getCategoryCandidates();
-  console.log("[addCategoryCandidate] 기존 후보:", candidates);
   const newCandidate = {
     id: `candidate-${Date.now()}`,
     categoryName,
@@ -169,10 +177,7 @@ export function addCategoryCandidate(
     thumbnail: getRandomColor(),
     timestamp: new Date().toISOString(),
   };
-  console.log("[addCategoryCandidate] 새 후보:", newCandidate);
   setCategoryCandidates([...candidates, newCandidate]);
-  const updatedCandidates = getCategoryCandidates();
-  console.log("[addCategoryCandidate] 저장 후 후보:", updatedCandidates);
   return newCandidate;
 }
 
@@ -190,6 +195,46 @@ export function setCategoryCandidates(candidates: any[]) {
 export function getCandidatesByCategory(categoryName: string) {
   const allCandidates = getCategoryCandidates();
   return allCandidates.filter((c: any) => c.categoryName === categoryName);
+}
+
+// Gourmet 요청 관리 함수들
+export function getGourmetRequests() {
+  return getLocalStorage(STORAGE_KEYS.GOURMET_REQUESTS, []);
+}
+
+export function setGourmetRequests(requests: any[]) {
+  setLocalStorage(STORAGE_KEYS.GOURMET_REQUESTS, requests);
+}
+
+// Owner가 gourmet에게 요청 보내기
+export function sendRequestToGourmet(
+  gourmetNickname: string,
+  menuName: string,
+  ownerInfo: {
+    name: string;
+    rating?: number;
+    reviewCount?: number;
+    distance?: string;
+  }
+) {
+  const requests = getGourmetRequests();
+  const newRequest = {
+    id: `request-${Date.now()}`,
+    type: "received" as const,
+    title: menuName,
+    subtitle:
+      ownerInfo.rating && ownerInfo.reviewCount && ownerInfo.distance
+        ? `${ownerInfo.rating}(${ownerInfo.reviewCount}) ${ownerInfo.distance}`
+        : ownerInfo.name,
+    thumbnail: getRandomColor(),
+    gourmetNickname,
+    ownerName: ownerInfo.name,
+    menuName,
+    timestamp: new Date().toISOString(),
+  };
+  setGourmetRequests([...requests, newRequest]);
+  console.log("[sendRequestToGourmet] 요청 전송:", newRequest);
+  return newRequest;
 }
 
 // 랜덤 색상 생성 (메뉴 썸네일용)
