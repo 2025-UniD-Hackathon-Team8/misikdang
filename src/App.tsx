@@ -1,12 +1,10 @@
 import "./App.css";
-import Button from "./components/Button";
+import UserRequestHistoryPage from "./pages/UserRequestHistoryPage";
 
 function App() {
   return (
     <>
-      <div>
-        <Button>ㅎㅇㅎㅇ</Button>
-      </div>
+      <UserRequestHistoryPage />
     </>
   );
 }
