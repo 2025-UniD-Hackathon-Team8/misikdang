@@ -62,19 +62,13 @@ export default function FoodCard({
 
   return (
     <motion.div
-      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${
-        !isBackground ? "cursor-grab active:cursor-grabbing" : ""
-      }`}
+      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${!isBackground ? "cursor-grab active:cursor-grabbing" : ""}`}
       initial={{
         rotate: isBackground ? backgroundRotation : 0,
         opacity: 1,
       }}
       animate={{
-        rotate: isBackground
-          ? backgroundRotation
-          : !isDragging
-          ? [0, -1.5, 1.5, -1.5, 1.5, 0]
-          : 0,
+        rotate: isBackground ? backgroundRotation : !isDragging ? [0, -1.5, 1.5, -1.5, 1.5, 0] : 0,
         opacity: 1,
       }}
       transition={{
@@ -104,12 +98,7 @@ export default function FoodCard({
     >
       {/* Food Image */}
       <div className="w-full h-80 overflow-hidden bg-gray-100">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
+        <img src={imageUrl} alt={title} className="w-full h-full object-cover" loading="eager" style={{ pointerEvents: "none" }} />
       </div>
 
       {/* Content */}
@@ -135,10 +124,7 @@ export default function FoodCard({
           </div>
 
           {/* Description */}
-          <p
-            className="text-xs leading-relaxed line-clamp-4"
-            style={{ color: colors.gray1 }}
-          >
+          <p className="text-xs leading-relaxed line-clamp-4" style={{ color: colors.gray1 }}>
             {description}
           </p>
         </div>

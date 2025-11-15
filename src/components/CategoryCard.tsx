@@ -59,19 +59,13 @@ export default function CategoryCard({
 
   return (
     <motion.div
-      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${
-        !isBackground ? "cursor-grab active:cursor-grabbing" : ""
-      }`}
+      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${!isBackground ? "cursor-grab active:cursor-grabbing" : ""}`}
       initial={{
         rotate: isBackground ? backgroundRotation : 0,
         opacity: 1,
       }}
       animate={{
-        rotate: isBackground
-          ? backgroundRotation
-          : !isDragging
-          ? [0, -1.5, 1.5, -1.5, 1.5, 0]
-          : 0,
+        rotate: isBackground ? backgroundRotation : !isDragging ? [0, -1.5, 1.5, -1.5, 1.5, 0] : 0,
         opacity: 1,
       }}
       transition={{
@@ -101,12 +95,7 @@ export default function CategoryCard({
     >
       {/* Category Image */}
       <div className="w-full h-70 overflow-hidden bg-gray-100">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
+        <img src={imageUrl} alt={title} className="w-full h-full object-cover" loading="eager" style={{ pointerEvents: "none" }} />
       </div>
 
       {/* Content */}
@@ -123,22 +112,19 @@ export default function CategoryCard({
 
         {/* Restaurant Count */}
         <p className={`text-sm mb-3"}`} style={{ color: colors.gray2 }}>
-          근처에 <span className="font-bold">{restaurants.length}</span>개의
-          식당이 있어요
+          근처에 <span className="font-bold">{restaurants.length}</span>개의 식당이 있어요
         </p>
 
         {/* Restaurant List */}
         <div className="space-y-2 mb-4 max-h-[200px] overflow-y-auto">
           {restaurants.map((restaurant, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
-            >
+            <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
               <img
                 src={restaurant.thumbnail}
                 alt={restaurant.name}
                 className="w-12 h-12 rounded-lg object-cover"
                 loading="eager"
+                style={{ pointerEvents: "none" }}
               />
               <div className="flex-1">
                 <p className="text-xs font-medium mb-1">{restaurant.name}</p>
@@ -147,9 +133,7 @@ export default function CategoryCard({
                   <span className="font-semibold">
                     {restaurant.rating}({restaurant.reviewCount})
                   </span>
-                  <span style={{ color: colors.gray2 }}>
-                    {restaurant.distance}
-                  </span>
+                  <span style={{ color: colors.gray2 }}>{restaurant.distance}</span>
                 </div>
               </div>
             </div>
