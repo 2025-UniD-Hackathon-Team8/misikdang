@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { colors } from "../constants/colors";
 
 // 색상의 밝기를 계산하는 함수 (0-255)
 const getLuminance = (r: number, g: number, b: number): number => {
@@ -8,7 +9,7 @@ const getLuminance = (r: number, g: number, b: number): number => {
 
 export const useImageColor = (imageUrl: string) => {
   const [color, setColor] = useState<string>("#FFB682");
-  const [textColor, setTextColor] = useState<string>("#000000");
+  const [textColor, setTextColor] = useState<string>(colors.primary);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export const useImageColor = (imageUrl: string) => {
 
           if (!ctx) {
             setColor("#FFB682");
-            setTextColor("#000000");
+            setTextColor(colors.primary);
             setLoading(false);
             return;
           }
@@ -67,13 +68,13 @@ export const useImageColor = (imageUrl: string) => {
           const isDark = luminance < 128;
 
           setColor(hexColor);
-          setTextColor(isDark ? "#ffffff" : "#000000");
+          setTextColor(isDark ? colors.secondary : colors.primary);
           setLoading(false);
         };
 
         img.onerror = () => {
           setColor("#FFB682");
-          setTextColor("#000000");
+          setTextColor(colors.primary);
           setLoading(false);
         };
 
@@ -81,7 +82,7 @@ export const useImageColor = (imageUrl: string) => {
       } catch (error) {
         console.error("Error extracting color:", error);
         setColor("#FFB682");
-        setTextColor("#000000");
+        setTextColor(colors.primary);
         setLoading(false);
       }
     };

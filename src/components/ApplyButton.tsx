@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { colors } from "../constants/colors";
 
 interface ApplyButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -30,9 +31,9 @@ export default function ApplyButton({
     }
   };
 
-  const buttonBg = applied ? bgColor || "#000000" : "#ffffff";
-  const buttonFg = applied ? fgColor || "#ffffff" : "#000000";
-  const buttonBorder = applied ? "none" : "2px solid #000000";
+  const buttonBg = applied ? bgColor || colors.primary : colors.secondary;
+  const buttonFg = applied ? fgColor || colors.secondary : colors.primary;
+  const buttonBorder = applied ? "none" : `2px solid ${colors.primary}`;
 
   const getDiscountText = () => {
     if (!discount) return null;
@@ -43,7 +44,7 @@ export default function ApplyButton({
   return (
     <div className="w-full">
       <button
-        className={`font-medium rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
         style={{
           backgroundColor: buttonBg,
           color: buttonFg,
@@ -55,10 +56,7 @@ export default function ApplyButton({
         {applied ? "신청 완료" : children}
       </button>
       {!applied && discount && (
-        <p
-          className="text-center text-xs mt-2 font-semibold"
-          style={{ color: "#FF6B6B" }}
-        >
+        <p className="text-center text-xs mt-2 font-semibold">
           {getDiscountText()}
         </p>
       )}

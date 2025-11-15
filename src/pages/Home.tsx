@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import FoodCard from "../components/FoodCard";
 import CategoryCard from "../components/CategoryCard";
 import ApplyButton from "../components/ApplyButton";
@@ -9,9 +9,17 @@ import { useImageColor } from "../hooks/useImageColor";
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [bgColor, setBgColor] = useState("#FFB682");
-  const [logoColor, setLogoColor] = useState("#000000");
+  const [logoColor, setLogoColor] = useState<string>(colors.primary);
 
-  const allCards = [...foodCategories, ...foodItems];
+  const allCards = useMemo(() => {
+    const cards = [...foodCategories, ...foodItems];
+    // Fisher-Yates 셔플 알고리즘
+    for (let i = cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    return cards;
+  }, []);
   const currentCard = allCards[currentIndex];
   const { color, textColor } = useImageColor(currentCard?.imageUrl || "");
 
@@ -81,7 +89,16 @@ export default function Home() {
                   {...card}
                   index={offset}
                   totalCards={3}
-                />
+                >
+                  <ApplyButton
+                    bgColor={colors.primary}
+                    fgColor={colors.secondary}
+                    className="w-full py-2 text-base font-bold rounded-2xl"
+                    discount={card.discount}
+                  >
+                    미식 신청하기
+                  </ApplyButton>
+                </FoodCard>
               );
             }
           }

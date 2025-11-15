@@ -44,75 +44,48 @@ export default function CategoryCard({
 
   const isBackground = index > 0;
   const backgroundRotation = index === 1 ? -3 : index === 2 ? -4 : 0;
-  const backgroundOpacity = index === 1 ? 0.5 : index === 2 ? 0.8 : 1;
   const zIndex = totalCards - index;
-
-  if (isBackground) {
-    return (
-      <motion.div
-        className="absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden"
-        initial={{
-          rotate: backgroundRotation,
-          opacity: backgroundOpacity,
-        }}
-        animate={{
-          rotate: backgroundRotation,
-          opacity: backgroundOpacity,
-        }}
-        transition={{
-          duration: 0.5,
-          ease: "easeOut",
-        }}
-        style={{
-          zIndex,
-          width: "320px",
-          height: "480px",
-          left: "50%",
-          marginLeft: "-160px",
-        }}
-      >
-        <div className="w-full h-40 overflow-hidden">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="p-4">
-          <h2 className="text-xl font-bold mb-1">{title}</h2>
-          <p className="text-xs mb-3" style={{ color: "#666666" }}>
-            {subtitle}
-          </p>
-        </div>
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div
-      className="absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden cursor-grab active:cursor-grabbing"
+      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${
+        !isBackground ? "cursor-grab active:cursor-grabbing" : ""
+      }`}
+      initial={{
+        rotate: isBackground ? backgroundRotation : 0,
+        opacity: 1,
+      }}
+      animate={{
+        rotate: isBackground ? backgroundRotation : 0,
+        opacity: 1,
+      }}
+      transition={{
+        duration: 0.5,
+        ease: "easeOut",
+      }}
       style={{
-        x,
-        rotate,
-        opacity,
+        x: !isBackground ? x : 0,
+        rotate: !isBackground ? rotate : undefined,
+        opacity: !isBackground ? opacity : 1,
         zIndex,
         width: "320px",
-        height: "500px",
+        height: "600px",
         left: "50%",
         marginLeft: "-160px",
       }}
-      drag="x"
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
-      onDragEnd={handleDragEnd}
-      whileTap={{ cursor: "grabbing" }}
+      drag={!isBackground ? "x" : false}
+      dragConstraints={!isBackground ? { left: 0, right: 0 } : undefined}
+      dragElastic={!isBackground ? 0.7 : undefined}
+      onDragEnd={!isBackground ? handleDragEnd : undefined}
+      whileTap={!isBackground ? { cursor: "grabbing" } : undefined}
     >
       {/* Category Image */}
-      <div className="w-full h-60 overflow-hidden">
+      <div className="w-full h-70 overflow-hidden bg-gray-100">
         <img
           src={imageUrl}
           alt={title}
           className="w-full h-full object-cover"
+          loading="eager"
         />
       </div>
 
@@ -126,12 +99,12 @@ export default function CategoryCard({
           {subtitle}
         </p>
 
+        <hr className={`border-t pt-1"}`} style={{ color: colors.gray1 }} />
+
         {/* Restaurant Count */}
-        <p
-          className="text-sm mb-3 font-semibold"
-          style={{ color: colors.gray2 }}
-        >
-          근처에 {restaurants.length}개의 식당이 있어요
+        <p className={`text-sm mb-3"}`} style={{ color: colors.gray2 }}>
+          근처에 <span className="font-bold">{restaurants.length}</span>개의
+          식당이 있어요
         </p>
 
         {/* Restaurant List */}
@@ -145,6 +118,7 @@ export default function CategoryCard({
                 src={restaurant.thumbnail}
                 alt={restaurant.name}
                 className="w-12 h-12 rounded-lg object-cover"
+                loading="eager"
               />
               <div className="flex-1">
                 <p className="text-xs font-medium mb-1">{restaurant.name}</p>
@@ -153,7 +127,7 @@ export default function CategoryCard({
                   <span className="font-semibold">
                     {restaurant.rating}({restaurant.reviewCount})
                   </span>
-                  <span style={{ color: "#aaaaaa" }}>
+                  <span style={{ color: colors.gray2 }}>
                     {restaurant.distance}
                   </span>
                 </div>
