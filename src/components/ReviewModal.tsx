@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { ReactNode } from "react"; // ReactNode는 이미 임포트되어 있으니, 인터페이스에 사용될 수 있도록 유지합니다.
+import type { ReactNode } from "react";
 
 // Props의 타입 정의
 interface ReviewModalProps {
@@ -49,9 +49,15 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
   const [recommendation, setRecommendation] = useState("");
   const [currentRating, setCurrentRating] = useState(0); // 별점 상태
 
-  // 리뷰 내용을 보여주는 임시 텍스트 (실제 앱에서는 서버에서 받은 리뷰 내용을 사용)
-  const sampleReviewText =
-    "맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고 맛있었다고";
+  // ⭐️ 맥도날드 리뷰를 위한 세 가지 샘플 텍스트 정의
+  const sampleFavoriteText =
+    "맥도날드는 역시 '빅맥'입니다. 언제 먹어도 변치 않는 클래식한 맛과 푸짐한 구성이 만족스러웠습니다. 특히 패티가 따뜻했고, 소스와 채소의 비율이 완벽하게 조화로웠습니다. 빠르고 일관된 퀄리티가 맥도날드의 최대 장점이라고 생각합니다.";
+
+  const sampleDisappointText =
+    "방문했던 시간대가 피크였는지, 감자튀김의 온도가 다소 미지근했습니다. 갓 튀긴 뜨거운 감자튀김을 기대했는데 아쉬웠어요. 그리고 드라이브 스루 주문 시 직원분의 응대가 조금 더 친절했으면 좋겠습니다.";
+
+  const sampleRecommendText =
+    "가성비를 중요하게 생각하거나 간단하게 한 끼를 해결하고 싶을 때 강력 추천합니다. 특히 런치 시간에는 다른 선택지가 없을 만큼 만족스럽습니다. 하지만 쾌적한 식사 환경을 기대한다면 피크 시간대는 피하는 것을 추천합니다.";
 
   const isPending = modalType === "pending"; // 리뷰 작성 모드인지
   const isHistory = modalType === "history"; // 리뷰 조회 모드인지
@@ -96,7 +102,8 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
                 placeholder="내용을 입력해주세요..."
               />
             ) : (
-              <p className="text-sm text-gray-700 whitespace-pre-line">{reviewData.reviewContent || sampleReviewText}</p>
+              // ⭐️ 수정 적용: 가장 마음에 들었던 점 (1번 텍스트)
+              <p className="text-sm text-gray-700 whitespace-pre-line">{reviewData.reviewContent || sampleFavoriteText}</p>
             )}
           </ReviewField>
 
@@ -111,7 +118,8 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
                 placeholder="내용을 입력해주세요..."
               />
             ) : (
-              <p className="text-sm text-gray-700 whitespace-pre-line">{reviewData.reviewContent || sampleReviewText}</p>
+              // ⭐️ 수정 적용: 아쉬웠던 점 (2번 텍스트)
+              <p className="text-sm text-gray-700 whitespace-pre-line">{reviewData.reviewContent || sampleDisappointText}</p>
             )}
           </ReviewField>
 
@@ -126,7 +134,8 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
                 placeholder="내용을 입력해주세요..."
               />
             ) : (
-              <p className="text-sm text-gray-700 whitespace-pre-line">{reviewData.reviewContent || sampleReviewText}</p>
+              // ⭐️ 수정 적용: 추천 여부 (3번 텍스트)
+              <p className="text-sm text-gray-700 whitespace-pre-line">{reviewData.reviewContent || sampleRecommendText}</p>
             )}
           </ReviewField>
 
@@ -141,7 +150,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, reviewData, 
         {/* 하단 액션 버튼 */}
         <div className="p-4 pt-0 sticky bottom-0 bg-white border-t border-gray-100 z-[1]">
           {isPending ? (
-            // 리뷰 작성 모드 버튼 (image_4cee38.png)
+            // 리뷰 작성 모드 버튼
             <div className="flex space-x-3">
               <button
                 onClick={onClose}

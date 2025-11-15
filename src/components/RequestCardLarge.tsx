@@ -5,6 +5,8 @@ interface CardAction {
   label: string;
   onClick?: (event: MouseEvent<HTMLButtonElement>) => void;
   variant?: "primary" | "secondary";
+  disabled?: boolean;
+  fullWidth?: boolean;
 }
 
 interface RequestCardLargeProps {
@@ -36,10 +38,11 @@ function renderAction(action?: CardAction, variant: "primary" | "secondary" = "p
     <Button
       bgColor={isSecondary ? "#ffffff" : undefined}
       fgColor={isSecondary ? "var(--color-primary)" : undefined}
-      className={`h-[40px] w-[155px] text-sm ${
+      className={`h-[40px] ${action.fullWidth ? "w-full" : "w-[155px]"} text-sm ${
         isSecondary ? "border border-[var(--color-gray-2)]" : ""
-      }`}
+      } ${action.disabled ? "opacity-50" : ""}`}
       onClick={action.onClick}
+      disabled={action.disabled}
     >
       {action.label}
     </Button>
@@ -63,7 +66,7 @@ export default function RequestCardLarge({
       role={onCardClick ? "button" : undefined}
       tabIndex={onCardClick ? 0 : undefined}
       onClick={onCardClick}
-      className={`flex h-[150px] w-[345px] flex-col justify-between rounded-[10px] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.06)] ${
+      className={`flex min-h-[75px] w-[345px] flex-col rounded-[10px] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(0,0,0,0.06)] ${
         onCardClick ? "cursor-pointer" : ""
       } ${className}`}
     >
@@ -92,7 +95,9 @@ export default function RequestCardLarge({
       </div>
 
       {(leftAction || rightAction) && (
-        <div className="flex w-full justify-between pt-3">
+        <div
+          className={`flex w-full ${leftAction?.fullWidth || rightAction?.fullWidth ? "pt-2" : "justify-between pt-3"}`}
+        >
           {renderAction(leftAction, "secondary")}
           {renderAction(rightAction, "primary")}
         </div>

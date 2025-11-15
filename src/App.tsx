@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 import OnboardingPage from "./pages/OnboardingPage";
 import OwnerRegisteredMenuPage from "./pages/OwnerRegisteredMenuPage";
@@ -10,6 +11,9 @@ import Header from "./components/Header";
 import BottomNav from "./components/BottomNav";
 import Profile from "./pages/Profile";
 import OwnerProfile from "./pages/OwnerProfile";
+import { foodCategories, foodItems } from "./data/mockData";
+import { gourmetProfile, ownerProfile } from "./data/mockProfiles";
+import { initializeMockData } from "./utils/localStorage";
 
 type PageKey =
   | "home"
@@ -29,6 +33,11 @@ function App({ initialPage = "onboarding" }: AppProps) {
   const [currentPage, setCurrentPage] = useState<PageKey>(initialPage);
   const [userMode, setUserMode] = useState<UserMode>(null);
   const showBottomNav = currentPage !== "onboarding";
+
+  // 앱 시작 시 mock 데이터 초기화
+  useEffect(() => {
+    initializeMockData(foodCategories, foodItems, gourmetProfile, ownerProfile);
+  }, []);
 
   const handleStartChef = () => {
     setUserMode("chef");
@@ -64,10 +73,30 @@ function App({ initialPage = "onboarding" }: AppProps) {
     }
   };
 
+  // 현재 페이지에 따라 활성 탭 결정
+  const getActiveTab = (): "left" | "middle" | "right" | undefined => {
+    if (currentPage === "home" || currentPage === "owner-registered-menu") {
+      return "left";
+    }
+    if (
+      currentPage === "user-request-history" ||
+      currentPage === "owner-request-history"
+    ) {
+      return "middle";
+    }
+    if (currentPage === "profile" || currentPage === "owner-profile") {
+      return "right";
+    }
+    return undefined;
+  };
+
   let content: ReactNode;
   if (currentPage === "onboarding") {
     content = (
-      <OnboardingPage onStartChef={handleStartChef} onStartGourmet={handleStartGourmet} />
+      <OnboardingPage
+        onStartChef={handleStartChef}
+        onStartGourmet={handleStartGourmet}
+      />
     );
   } else if (currentPage === "owner-registered-menu") {
     content = <OwnerRegisteredMenuPage />;
@@ -82,7 +111,6 @@ function App({ initialPage = "onboarding" }: AppProps) {
   } else {
     content = (
       <>
-        <Header />
         <Home />
       </>
     );
@@ -90,14 +118,26 @@ function App({ initialPage = "onboarding" }: AppProps) {
 
   return (
     <>
+      <Header />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentPage}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {content}
+        </motion.div>
+      </AnimatePresence>
       {showBottomNav && (
         <BottomNav
+          activeTab={getActiveTab()}
           onLeftClick={handleNavLeft}
           onMiddleClick={handleNavMiddle}
           onRightClick={handleNotImplemented}
         />
       )}
-      {content}
     </>
   );
 }

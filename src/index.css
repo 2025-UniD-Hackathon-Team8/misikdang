@@ -2,8 +2,7 @@
 
 @font-face {
   font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.woff2")
-      format("woff2");
+  src: url("./assets/fonts/PretendardVariable.woff2") format("woff2");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
@@ -20,8 +19,7 @@
 
 @font-face {
   font-family: "TmonMonsori";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/TmonMonsori.woff")
-    format("woff");
+  src: url("./assets/fonts/TmonMonsori.otf.otf") format("opentype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -29,9 +27,8 @@
 
 @font-face {
   font-family: "Inter";
-  src: url("https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/inter/Inter-Bold.woff2")
-    format("woff2");
-  font-weight: 700;
+  src: url("./assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }

@@ -149,7 +149,7 @@ export default function OwnerRegisteredMenuPage() {
 
   return (
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-6 text-left">
-      <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-12 pt-[125px]">
+      <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-24 pt-[125px]">
         {selectedMenu && (
           <button
             type="button"

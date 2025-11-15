@@ -2,54 +2,33 @@ import React, { useState, useMemo, useEffect } from "react";
 import ToggleTabs from "../components/ToggleTabs";
 import RequestCardSmall from "../components/RequestCardSmall";
 import ReviewModal from "../components/ReviewModal";
-
-interface ProfileData {
-  nickname: string;
-  userId: string;
-  joinDate: string;
-  reviewTemperature: number;
-  reviewCompletionRate: number;
-  pendingReviews: {
-    restaurantName: string;
-    visitDate: string;
-  }[];
-  recentReviews: {
-    restaurantName: string;
-    visitDate: string;
-  }[];
-}
+import { getGourmetProfile, setGourmetProfile } from "../utils/localStorage";
+import type { ProfileData } from "../data/mockProfiles";
 
 type ReviewItem = ProfileData["pendingReviews"][number];
 
-const profileData: ProfileData = {
-  nickname: "미식한고독가",
-  userId: "#B23DSW13",
-  joinDate: "2025년 11월 15일 가입",
-  reviewTemperature: 65.8,
-  reviewCompletionRate: 60,
-  pendingReviews: [
-    { restaurantName: "KFC 종로점", visitDate: "2025년 11월 12일 방문함" },
-    { restaurantName: "맘스터치 여의도점", visitDate: "2025년 11월 12일 방문함" },
-    { restaurantName: "쉐이크쉑 청담점", visitDate: "2025년 11월 11일 방문함" },
-    { restaurantName: "맥도날드 부산점", visitDate: "2025년 11월 11일 방문함" },
-
-    { restaurantName: "이케아 광명점 푸드코트", visitDate: "2025년 11월 10일 방문함" },
-    { restaurantName: "스타벅스 리저브 을지로점", visitDate: "2025년 11월 9일 방문함" },
-    { restaurantName: "파리바게뜨 잠실점", visitDate: "2025년 11월 8일 방문함" },
-  ],
-  recentReviews: [
-    { restaurantName: "맥도날드 삼성역 8번출구점", visitDate: "2025년 11월 14일 방문함" },
-    { restaurantName: "맥도날드 삼성역 8번출구점", visitDate: "2025년 11월 14일 방문함" },
-
-    { restaurantName: "버거킹 강남점", visitDate: "2025년 11월 13일 방문함" },
-    { restaurantName: "롯데리아 홍대점", visitDate: "2025년 11월 13일 방문함" },
-  ],
-};
-
 const ProfileScreen: React.FC = () => {
-  const { nickname, userId, joinDate, reviewTemperature, reviewCompletionRate, pendingReviews, recentReviews } = profileData;
+  // localStorage에서 프로필 데이터 가져오기
+  const profileData = getGourmetProfile() as ProfileData | null;
 
-  const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">("pendingReview");
+  // 프로필 데이터가 없으면 기본값 사용
+  if (!profileData) {
+    return <div>프로필을 불러오는 중...</div>;
+  }
+
+  const {
+    nickname,
+    userId,
+    joinDate,
+    reviewTemperature,
+    reviewCompletionRate,
+    pendingReviews,
+    recentReviews,
+  } = profileData;
+
+  const [activeTab, setActiveTab] = useState<"pendingReview" | "reviewHistory">(
+    "pendingReview"
+  );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -104,16 +83,23 @@ const ProfileScreen: React.FC = () => {
 
   return (
     <div className="h-dvh bg-white">
-      <div className="h-full flex flex-col max-w-lg mx-auto relative p-4">
+      <div className="h-full flex flex-col max-w-lg mx-auto relative p-4 mt-6">
         {/*
           주의: 이 flex-shrink-0 div에는 현재 p-4가 적용되어 있지만, 
           하단 리스트 렌더링 영역의 스크롤을 위해 p-4를 p-0으로 바꾸고 
           내부 div에 px-5를 적용하는 것이 일반적이나, 
           요청하신 부분 외는 최소한으로 수정합니다. 
         */}
-        <div className="px-5 flex-shrink-0" style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}>
+        <div
+          className="px-5 flex-shrink-0"
+          style={{ paddingTop: "calc(32px + env(safe-area-inset-top))" }}
+        >
           <div className="flex items-center mb-5 text-left">
-            <img src={userAvatar} alt="User Avatar" className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover" />
+            <img
+              src={userAvatar}
+              alt="User Avatar"
+              className="w-24 h-24 rounded-full mr-4 border border-gray-200 object-cover"
+            />
             <div className="justify-center">
               <h1 className="text-2xl font-bold text-gray-900">{nickname}</h1>
               <p className="text-sm text-gray-500 mt-1 ">{userId}</p>
@@ -122,30 +108,51 @@ const ProfileScreen: React.FC = () => {
           </div>
 
           <button className="w-full border border-gray-900 py-2.5 rounded-md text-center mb-8 hover:bg-gray-100 transition duration-150">
-            <span className="text-base font-semibold text-gray-900">프로필 수정</span>
+            <span className="text-base font-semibold text-gray-900">
+              프로필 수정
+            </span>
           </button>
 
           <div className="mb-4">
-            <p className="text-sm font-bold text-gray-700 text-left">리뷰온도</p>
-            <h2 className="text-4xl font-bold text-orange-600 mb-2 text-left">{reviewTemperature}°C</h2>
+            <p className="text-sm font-bold text-gray-700 text-left">
+              리뷰온도
+            </p>
+            <h2 className="text-4xl font-bold text-orange-600 mb-2 text-left">
+              {reviewTemperature}°C
+            </h2>
             <div className="h-1.5 bg-gray-200 rounded-full ">
               {/* 3. 애니메이션 적용: transition-all duration-1000 클래스 추가 */}
-              <div className="h-1.5 bg-orange-600 rounded-full transition-all duration-1000 ease-out" style={{ width: animatedProgressWidth }} />
+              <div
+                className="h-1.5 bg-orange-600 rounded-full transition-all duration-1000 ease-out"
+                style={{ width: animatedProgressWidth }}
+              />
             </div>
           </div>
 
           <div className="mb-6">
-            <p className="text-sm font-bold text-gray-800 text-left">리뷰 작성률 {reviewCompletionRate}%</p>
-            <p className="text-xs text-gray-500 mt-1 text-left">표시될 만큼 미식한 식당의 리뷰를 작성했어요</p>
+            <p className="text-sm font-bold text-gray-800 text-left">
+              리뷰 작성률 {reviewCompletionRate}%
+            </p>
+            <p className="text-xs text-gray-500 mt-1 text-left">
+              표시될 만큼 미식한 식당의 리뷰를 작성했어요
+            </p>
           </div>
 
           <div className="flex mb-5 justify-center">
-            <ToggleTabs tabs={reviewTabs} activeTabId={activeTab} onTabSelect={handleTabSelect} className="mx-auto" />
+            <ToggleTabs
+              tabs={reviewTabs}
+              activeTabId={activeTab}
+              onTabSelect={handleTabSelect}
+              className="mx-auto"
+            />
           </div>
         </div>
 
         {/* 👇 수정된 부분: overflow-y-auto 영역에 px-5를 추가하여 리스트가 좌우 패딩을 갖도록 수정 */}
-        <div className="flex-1 overflow-y-auto" style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}>
+        <div
+          className="flex-1 overflow-y-auto"
+          style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
+        >
           {activeTab === "reviewHistory" &&
             recentReviews.map((review, index) => (
               <RequestCardSmall
@@ -176,8 +183,12 @@ const ProfileScreen: React.FC = () => {
               ))
             ) : (
               <div className="text-center py-10 text-gray-500">
-                <p className="text-base font-semibold">작성할 리뷰가 대기 중입니다. 🍽️</p>
-                <p className="text-sm mt-1">맛있는 식사 후 리뷰를 작성해보세요!</p>
+                <p className="text-base font-semibold">
+                  작성할 리뷰가 대기 중입니다. 🍽️
+                </p>
+                <p className="text-sm mt-1">
+                  맛있는 식사 후 리뷰를 작성해보세요!
+                </p>
               </div>
             ))}
         </div>
@@ -199,7 +210,15 @@ const ProfileScreen: React.FC = () => {
         </div>
 
         {/* 2. ReviewModal 컴포넌트 조건부 렌더링 추가 */}
-        {modalData && <ReviewModal isOpen={isModalOpen} onClose={closeModal} reviewData={modalData.review} modalType={modalData.type} showRating={false} />}
+        {modalData && (
+          <ReviewModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            reviewData={modalData.review}
+            modalType={modalData.type}
+            showRating={false}
+          />
+        )}
       </div>
     </div>
   );

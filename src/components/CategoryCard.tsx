@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { color, motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
 import { colors } from "../constants";
 import { useState } from "react";
@@ -59,28 +59,32 @@ export default function CategoryCard({
 
   return (
     <motion.div
-      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${
-        !isBackground ? "cursor-grab active:cursor-grabbing" : ""
-      }`}
+      className={`absolute top-0 left-0 bg-white rounded-3xl shadow-2xl overflow-hidden ${!isBackground ? "cursor-grab active:cursor-grabbing" : ""}`}
       initial={{
         rotate: isBackground ? backgroundRotation : 0,
         opacity: 1,
       }}
       animate={{
-        rotate: isBackground
-          ? backgroundRotation
-          : !isDragging
-          ? [0, -1.5, 1.5, -1.5, 1.5, 0]
-          : 0,
+        // 드래그 중일 때는 rotate: 0 (흔들림 멈춤)
+        rotate: isBackground ? backgroundRotation : !isDragging ? [0, -1.5, 1.5, -1.5, 1.5, 0] : 0,
         opacity: 1,
       }}
-      transition={{
-        duration: isBackground ? 0.5 : 1.5,
-        ease: "easeInOut",
-        repeat: isBackground || isDragging ? 0 : Infinity,
-        repeatDelay: 4,
-        delay: isBackground ? 0 : 2,
-      }}
+      // ⭐️ 수정: isDragging 상태에 따라 transition을 동적으로 변경하여 드래그 중 애니메이션 즉시 중단
+      transition={
+        !isDragging || isBackground
+          ? {
+              // 드래그 중이 아니거나 배경 카드일 때: 일반 또는 반복 애니메이션 설정
+              duration: isBackground ? 0.5 : 1.5,
+              ease: "easeInOut",
+              repeat: isBackground ? 0 : Infinity,
+              repeatDelay: 4,
+              delay: isBackground ? 0 : 2,
+            }
+          : {
+              // 드래그 중이면서 전면 카드일 때: 즉시 멈춤 (duration 0)
+              duration: 0,
+            }
+      }
       style={{
         x: !isBackground ? x : 0,
         rotate: !isBackground ? rotate : backgroundRotation,
@@ -101,15 +105,10 @@ export default function CategoryCard({
     >
       {/* Category Image */}
       <div className="w-full h-70 overflow-hidden bg-gray-100">
-        <img
-          src={imageUrl}
-          alt={title}
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
+        <img src={imageUrl} alt={title} className="w-full h-full object-cover" loading="eager" style={{ pointerEvents: "none" }} />
       </div>
 
-      {/* Content */}
+      {/* Content (생략) */}
       <div className="px-4 py-3">
         {/* Title */}
         <h2 className="text-xl font-bold mb-1">{title}</h2>
@@ -123,22 +122,19 @@ export default function CategoryCard({
 
         {/* Restaurant Count */}
         <p className={`text-sm mb-3"}`} style={{ color: colors.gray2 }}>
-          근처에 <span className="font-bold">{restaurants.length}</span>개의
-          식당이 있어요
+          근처에 <span className="font-bold">{restaurants.length}</span>개의 식당이 있어요
         </p>
 
         {/* Restaurant List */}
         <div className="space-y-2 mb-4 max-h-[200px] overflow-y-auto">
           {restaurants.map((restaurant, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50"
-            >
+            <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
               <img
                 src={restaurant.thumbnail}
                 alt={restaurant.name}
                 className="w-12 h-12 rounded-lg object-cover"
                 loading="eager"
+                style={{ pointerEvents: "none" }}
               />
               <div className="flex-1">
                 <p className="text-xs font-medium mb-1">{restaurant.name}</p>
@@ -147,9 +143,7 @@ export default function CategoryCard({
                   <span className="font-semibold">
                     {restaurant.rating}({restaurant.reviewCount})
                   </span>
-                  <span style={{ color: colors.gray2 }}>
-                    {restaurant.distance}
-                  </span>
+                  <span style={{ color: colors.gray2 }}>{restaurant.distance}</span>
                 </div>
               </div>
             </div>
