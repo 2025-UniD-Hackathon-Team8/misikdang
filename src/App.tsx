@@ -1,10 +1,10 @@
 import "./App.css";
-import UserRequestHistoryPage from "./pages/UserRequestHistoryPage";
+import OwnerRequestHistoryPage from "./pages/OwnerRequestHistoryPage";
 
 function App() {
   return (
     <>
-      <UserRequestHistoryPage />
+      <OwnerRequestHistoryPage />
     </>
   );
 }

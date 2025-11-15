@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import Button from "../components/Button";
+import RequestCardLarge from "../components/RequestCardLarge";
 
 type MenuItem = {
   id: string;
@@ -190,74 +190,42 @@ export default function OwnerRegisteredMenuPage() {
                 </p>
               )}
               {commentsMap[selectedMenu.name]?.map((comment) => (
-                <article
+                <RequestCardLarge
                   key={comment.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setModalComment(comment)}
-                  className="flex h-[150px] w-[345px] cursor-pointer flex-col justify-between rounded-[10px] bg-white px-4 py-4 shadow-[0_6px_18px_rgba(0,0,0,0.06)]"
-                >
-                  <div className="flex flex-1 items-center gap-4">
-                    <div
-                      className="h-[45px] w-[45px] rounded-[10px]"
-                      style={{ backgroundColor: comment.thumbnail }}
-                    />
-                    <div className="flex flex-1 flex-col overflow-hidden">
-                      <h2 className="truncate text-base font-semibold text-[var(--color-primary)]">
-                        {comment.nickname}
-                      </h2>
-                      <p className="text-sm text-[var(--color-gray-1)]">
-                        리뷰온도 {comment.temperature.toFixed(1)} ℃
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      className="text-xl text-[#cccccc] transition hover:text-[var(--color-gray-2)]"
-                      aria-label={`${comment.nickname} 코멘트 닫기`}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setCommentsMap((prev) => ({
-                          ...prev,
-                          [selectedMenu.name]: (prev[selectedMenu.name] ?? []).filter(
-                            (item) => item.id !== comment.id,
-                          ),
-                        }));
-                      }}
-                    >
-                      ×
-                    </button>
-                  </div>
-
-                  <div className="flex w-full justify-between pt-3">
-                    <Button
-                      bgColor="#ffffff"
-                      fgColor="var(--color-primary)"
-                      className="h-[40px] w-[155px] border border-[var(--color-gray-2)] text-sm"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setCommentsMap((prev) => ({
-                          ...prev,
-                          [selectedMenu.name]: (prev[selectedMenu.name] ?? []).filter(
-                            (item) => item.id !== comment.id,
-                          ),
-                        }));
-                      }}
-                    >
-                      삭제하기
-                    </Button>
-                    <Button
-                      className="h-[40px] w-[155px] text-sm"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        alert(
-                          `${comment.nickname}님의 리뷰를 기반으로 요청을 보낼 예정입니다.`,
-                        );
-                      }}
-                    >
-                      요청보내기
-                    </Button>
-                  </div>
-                </article>
+                  title={comment.nickname}
+                  subtitle={`리뷰온도 ${comment.temperature.toFixed(1)} ℃`}
+                  thumbnailColor={comment.thumbnail}
+                  showRatingIcon={false}
+                  onCardClick={() => setModalComment(comment)}
+                  onClose={() =>
+                    setCommentsMap((prev) => ({
+                      ...prev,
+                      [selectedMenu.name]: (prev[selectedMenu.name] ?? []).filter(
+                        (item) => item.id !== comment.id,
+                      ),
+                    }))
+                  }
+                  leftAction={{
+                    label: "삭제하기",
+                    variant: "secondary",
+                    onClick: (event) => {
+                      event.stopPropagation();
+                      setCommentsMap((prev) => ({
+                        ...prev,
+                        [selectedMenu.name]: (prev[selectedMenu.name] ?? []).filter(
+                          (item) => item.id !== comment.id,
+                        ),
+                      }));
+                    },
+                  }}
+                  rightAction={{
+                    label: "요청보내기",
+                    onClick: (event) => {
+                      event.stopPropagation();
+                      alert(`${comment.nickname}님의 리뷰를 기반으로 요청을 보낼 예정입니다.`);
+                    },
+                  }}
+                />
               ))}
             </div>
           </>
