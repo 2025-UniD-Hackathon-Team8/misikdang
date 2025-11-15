@@ -3,11 +3,9 @@ import Button from "./components/Button";
 
 function App() {
   return (
-    <>
-      <div>
-        <Button>ㅎㅇㅎㅇ</Button>
-      </div>
-    </>
+    <div>
+      <Button>ㅎㅇㅎㅇ</Button>
+    </div>
   );
 }
 
