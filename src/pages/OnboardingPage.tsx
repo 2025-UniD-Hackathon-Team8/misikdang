@@ -40,6 +40,7 @@ export default function OnboardingPage({
   onStartGourmet,
 }: OnboardingPageProps) {
   const [showMainContent, setShowMainContent] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => setShowMainContent(true), 250);
@@ -47,7 +48,17 @@ export default function OnboardingPage({
   }, []);
 
   const handleGourmetStart = () => {
-    onStartGourmet();
+    setIsExiting(true);
+    setTimeout(() => {
+      onStartGourmet();
+    }, 300);
+  };
+
+  const handleChefStart = () => {
+    setIsExiting(true);
+    setTimeout(() => {
+      onStartChef();
+    }, 300);
   };
 
   const baseButtonClass =
@@ -73,14 +84,19 @@ export default function OnboardingPage({
         <motion.main
           className="flex min-h-dvh flex-col items-center bg-[var(--color-background)] px-6"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: isExiting ? 0 : 1 }}
           transition={{ duration: 0.25 }}
         >
           <div className="pt-[215px]">
             <MainBrandMark />
           </div>
 
-          <div className="mt-auto mb-[160px] flex flex-col items-center gap-5">
+          <motion.div
+            className="mt-auto mb-[160px] flex flex-col items-center gap-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: isExiting ? 0 : 1, y: isExiting ? 20 : 0 }}
+            transition={{ duration: 0.3, delay: isExiting ? 0 : 0.3 }}
+          >
             <button
               type="button"
               className={`${baseButtonClass} border border-[#000000] text-[#000000]`}
@@ -91,11 +107,11 @@ export default function OnboardingPage({
             <button
               type="button"
               className={`${baseButtonClass} border border-[#000000] bg-[#000000] text-[#ffffff]`}
-              onClick={onStartChef}
+              onClick={handleChefStart}
             >
               쉐프로 시작하기
             </button>
-          </div>
+          </motion.div>
         </motion.main>
       )}
     </>

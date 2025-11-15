@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import "./App.css";
 import OnboardingPage from "./pages/OnboardingPage";
 import OwnerRegisteredMenuPage from "./pages/OwnerRegisteredMenuPage";
@@ -64,6 +65,30 @@ function App({ initialPage = "onboarding" }: AppProps) {
     }
   };
 
+  // 현재 페이지에 따라 활성 탭 결정
+  const getActiveTab = ():
+    | "left"
+    | "middle"
+    | "right"
+    | undefined => {
+    if (
+      currentPage === "home" ||
+      currentPage === "owner-registered-menu"
+    ) {
+      return "left";
+    }
+    if (
+      currentPage === "user-request-history" ||
+      currentPage === "owner-request-history"
+    ) {
+      return "middle";
+    }
+    if (currentPage === "profile" || currentPage === "owner-profile") {
+      return "right";
+    }
+    return undefined;
+  };
+
   let content: ReactNode;
   if (currentPage === "onboarding") {
     content = (
@@ -93,9 +118,20 @@ function App({ initialPage = "onboarding" }: AppProps) {
   return (
     <>
       <Header />
-      {content}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentPage}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {content}
+        </motion.div>
+      </AnimatePresence>
       {showBottomNav && (
         <BottomNav
+          activeTab={getActiveTab()}
           onLeftClick={handleNavLeft}
           onMiddleClick={handleNavMiddle}
           onRightClick={handleNotImplemented}

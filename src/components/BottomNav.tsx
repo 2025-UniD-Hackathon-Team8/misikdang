@@ -1,4 +1,7 @@
+import { motion } from "framer-motion";
+
 type BottomNavProps = {
+  activeTab?: "left" | "middle" | "right";
   onLeftClick: () => void;
   onMiddleClick: () => void;
   onRightClick: () => void;
@@ -9,43 +12,78 @@ const iconButtonProps = {
   type: "button" as const,
 };
 
-function BottomNav({ onLeftClick, onMiddleClick, onRightClick }: BottomNavProps) {
+function BottomNav({
+  activeTab = "left",
+  onLeftClick,
+  onMiddleClick,
+  onRightClick,
+}: BottomNavProps) {
   return (
     <div className="fixed bottom-0 left-0 z-50 w-full flex justify-center bg-transparent">
       <div className="inline-flex w-[393px] h-[60px] pl-[65px] pr-[64px] py-4 justify-center items-center gap-[92px] bg-white shadow-[0_-2px_10px_rgba(0,0,0,0.10)]">
-        <button
+        <motion.button
           {...iconButtonProps}
           className={buttonBaseClass}
           aria-label="홈으로 이동"
           onClick={onLeftClick}
+          animate={{
+            scale: activeTab === "left" ? 1.2 : 1,
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="28" viewBox="0 0 26 28" fill="none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="26"
+            height="28"
+            viewBox="0 0 26 28"
+            fill="none"
+          >
             <path
               d="M10.446 0.108003C10.5783 0.173606 10.6945 0.267713 10.7861 0.383559C10.8778 0.499405 10.9426 0.634114 10.976 0.778003C11.012 0.936003 12 5.164 12 8C12 9.9 11.116 11.594 9.74 12.692C9.24 13.092 9 13.528 9 13.892V14.864C9 14.9107 9.00267 14.9547 9.008 14.996C9.076 15.492 9.322 17.334 9.552 19.244C9.778 21.118 10 23.162 10 24C10 25.0609 9.57857 26.0783 8.82843 26.8284C8.07828 27.5786 7.06087 28 6 28C4.93913 28 3.92172 27.5786 3.17157 26.8284C2.42143 26.0783 2 25.0609 2 24C2 23.16 2.222 21.12 2.448 19.244C2.678 17.334 2.924 15.492 2.992 14.996L3 14.864V13.892C3 13.528 2.76 13.092 2.26 12.692C1.55496 12.13 0.985657 11.4163 0.59439 10.604C0.203124 9.79168 -3.94522e-05 8.90163 5.74647e-09 8C5.74647e-09 5.174 0.98 0.968003 1.024 0.780003C1.07599 0.557683 1.20178 0.359539 1.38084 0.217886C1.55991 0.0762329 1.78168 -0.000570094 2.01 3.18621e-06C2.57 3.18621e-06 3.024 0.454003 3.024 1.014V7.01C3.01612 7.14506 3.036 7.2803 3.08242 7.40738C3.12884 7.53446 3.20081 7.65067 3.29389 7.74885C3.38698 7.84703 3.49919 7.92508 3.62362 7.9782C3.74805 8.03132 3.88204 8.05837 4.01733 8.05769C4.15262 8.057 4.28633 8.0286 4.41021 7.97422C4.53409 7.91985 4.64551 7.84066 4.7376 7.74154C4.82968 7.64243 4.90048 7.52549 4.94561 7.39795C4.99074 7.27041 5.00925 7.13498 5 7V1C5 0.734787 5.10536 0.480433 5.29289 0.292896C5.48043 0.10536 5.73478 3.18621e-06 6 3.18621e-06C6.26522 3.18621e-06 6.51957 0.10536 6.70711 0.292896C6.89464 0.480433 7 0.734787 7 1V7.052C7.00557 7.31457 7.11521 7.56416 7.30481 7.74589C7.49441 7.92761 7.74844 8.02657 8.011 8.021C8.27356 8.01543 8.52316 7.90579 8.70489 7.71619C8.88661 7.52659 8.98557 7.27257 8.98 7.01V1.01C8.98 0.452003 9.432 3.18621e-06 9.992 3.18621e-06C10.036 3.18621e-06 10.232 3.2266e-06 10.446 0.108003ZM15 9C15 6.61305 15.9482 4.32387 17.636 2.63604C19.3239 0.948214 21.6131 3.18621e-06 24 3.18621e-06C24.2652 3.18621e-06 24.5196 0.10536 24.7071 0.292896C24.8946 0.480433 25 0.734787 25 1V12.946L25.038 13.3C25.1971 14.7927 25.3498 16.286 25.496 17.78C25.742 20.292 26 23.108 26 24C26 25.0609 25.5786 26.0783 24.8284 26.8284C24.0783 27.5786 23.0609 28 22 28C20.9391 28 19.9217 27.5786 19.1716 26.8284C18.4214 26.0783 18 25.0609 18 24C18 23.108 18.258 20.292 18.504 17.78C18.63 16.506 18.756 15.286 18.85 14.382L18.89 14H17C16.4696 14 15.9609 13.7893 15.5858 13.4142C15.2107 13.0391 15 12.5304 15 12V9Z"
               fill="black"
             />
           </svg>
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           {...iconButtonProps}
           className={buttonBaseClass}
           aria-label="요청 내역으로 이동"
           onClick={onMiddleClick}
+          animate={{
+            scale: activeTab === "middle" ? 1.2 : 1,
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="22" viewBox="0 0 28 22" fill="none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="22"
+            viewBox="0 0 28 22"
+            fill="none"
+          >
             <path
               d="M25.2 0H2.8C2.05739 0 1.3452 0.289731 0.820101 0.805456C0.294999 1.32118 0 2.02065 0 2.75V19.25C0 19.9793 0.294999 20.6788 0.820101 21.1945C1.3452 21.7103 2.05739 22 2.8 22H25.2C25.9426 22 26.6548 21.7103 27.1799 21.1945C27.705 20.6788 28 19.9793 28 19.25V2.75C28 2.02065 27.705 1.32118 27.1799 0.805456C26.6548 0.289731 25.9426 0 25.2 0ZM25.2 5.8245L14 12.5373L2.8 5.8245V2.75H25.2V5.8245Z"
               fill="black"
             />
           </svg>
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           {...iconButtonProps}
           className={buttonBaseClass}
           aria-label="추가 기능"
           onClick={onRightClick}
+          animate={{
+            scale: activeTab === "right" ? 1.2 : 1,
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="26"
+            height="26"
+            viewBox="0 0 26 26"
+            fill="none"
+          >
             <path
               fillRule="evenodd"
               clipRule="evenodd"
@@ -53,7 +91,7 @@ function BottomNav({ onLeftClick, onMiddleClick, onRightClick }: BottomNavProps)
               fill="black"
             />
           </svg>
-        </button>
+        </motion.button>
       </div>
     </div>
   );
