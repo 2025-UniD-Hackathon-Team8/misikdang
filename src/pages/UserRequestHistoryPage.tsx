@@ -50,7 +50,7 @@ const REQUESTS: RequestItem[] = [
 ] as const;
 
 export default function UserRequestHistoryPage() {
-  const [activeTab, setActiveTab] = useState<TabId>("received");
+  const [activeTab, setActiveTab] = useState<TabId>("sent");
   const [requests, setRequests] = useState<RequestItem[]>(REQUESTS);
 
   const visibleRequests = useMemo(
