@@ -53,7 +53,7 @@ export default function Home() {
       }}
     >
       {/* Logo */}
-      <div className="py-10 flex justify-center items-end">
+      <div className="pt-20 pb-10 flex justify-center items-end">
         <div className="relative">
           <span
             className="text-3xl font-bold transition-colors duration-700 ease-in-out"
