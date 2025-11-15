@@ -3,9 +3,9 @@ import OwnerRequestHistoryPage from "./pages/OwnerRequestHistoryPage";
 
 function App() {
   return (
-    <>
-      <OwnerRequestHistoryPage />
-    </>
+    <div>
+      <Button>ㅎㅇㅎㅇ</Button>
+    </div>
   );
 }
 
