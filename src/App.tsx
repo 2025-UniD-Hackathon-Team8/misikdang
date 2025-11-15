@@ -66,15 +66,8 @@ function App({ initialPage = "onboarding" }: AppProps) {
   };
 
   // 현재 페이지에 따라 활성 탭 결정
-  const getActiveTab = ():
-    | "left"
-    | "middle"
-    | "right"
-    | undefined => {
-    if (
-      currentPage === "home" ||
-      currentPage === "owner-registered-menu"
-    ) {
+  const getActiveTab = (): "left" | "middle" | "right" | undefined => {
+    if (currentPage === "home" || currentPage === "owner-registered-menu") {
       return "left";
     }
     if (
