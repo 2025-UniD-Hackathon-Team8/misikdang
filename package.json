@@ -13,6 +13,7 @@
     "@davedev42/react-naver-maps": "^0.1.3-modern-react19-0.0.2",
     "@react-google-maps/api": "^2.20.7",
     "@tailwindcss/vite": "^4.1.17",
+    "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "colorthief": "^2.6.0",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.553.0",
