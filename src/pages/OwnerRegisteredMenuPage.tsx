@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import RequestCardLarge from "../components/RequestCardLarge";
 import ToggleTabs from "../components/ToggleTabs";
 import {
-  getOwnerMenus,
   getCandidatesByCategory,
   sendRequestToGourmet,
   getOwnerProfile,
+  getFoodItems,
 } from "../utils/localStorage";
 import {
   getMenusList,
@@ -83,14 +83,30 @@ export default function OwnerRegisteredMenuPage() {
   };
 
   const loadMenuData = () => {
-    const storedMenus = getOwnerMenus();
+    const allFoodItems = getFoodItems();
     const storedSubmenus = getMenusList();
-    setMenuItems(storedMenus);
+
+    // 카테고리 목록 생성 (중복 제거)
+    const categoryMap = new Map<string, MenuItem>();
+
+    allFoodItems.forEach((item: any) => {
+      if (item.category && !categoryMap.has(item.category)) {
+        categoryMap.set(item.category, {
+          id: `category-${item.category}`,
+          name: item.category,
+          thumbnail: item.image || getRandomColor(),
+          category: item.category,
+        });
+      }
+    });
+
+    const categories = Array.from(categoryMap.values());
+    setMenuItems(categories);
     setSubmenuItems(storedSubmenus);
 
-    // 각 메뉴/세부 메뉴의 후보 수를 commentsMap에 로드
+    // 각 카테고리의 후보 수를 commentsMap에 로드
     const newCommentsMap: Record<string, CommentItem[]> = {};
-    [...storedMenus, ...storedSubmenus].forEach((menu: { name: string }) => {
+    categories.forEach((menu) => {
       const candidates = getCandidatesByCategory(menu.name);
 
       // nickname 기준으로 중복 제거
@@ -107,6 +123,20 @@ export default function OwnerRegisteredMenuPage() {
       }));
     });
     setCommentsMap(newCommentsMap);
+  };
+
+  // Helper function for random color
+  const getRandomColor = () => {
+    const colors = [
+      "#ffe3d5",
+      "#e6f6ff",
+      "#f5e6ff",
+      "#ffe1e0",
+      "#ffecc1",
+      "#cdf2ff",
+      "#e4f7e4",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
   };
 
   const loadCandidates = (categoryName: string) => {
@@ -163,7 +193,7 @@ export default function OwnerRegisteredMenuPage() {
     <div className="flex min-h-dvh justify-center bg-[var(--color-background)] px-4 py-2 text-left">
       <main className="relative flex w-full max-w-[393px] flex-col items-center gap-[15px] px-4 pb-24 pt-[125px]">
         <h1 className="self-start text-2xl font-semibold text-[var(--color-primary)]">
-          등록한 메뉴
+          카테고리별 등록 현황
         </h1>
 
         <ToggleTabs
@@ -197,12 +227,12 @@ export default function OwnerRegisteredMenuPage() {
                     className="h-[44px] w-[44px] rounded-[10px]"
                     style={{ backgroundColor: menu.thumbnail }}
                   />
-                  <div className="flex flex-1 flex-col items-start justify-center">
+                  <div className="flex flex-1 items-center justify-between">
                     <span className="text-base font-semibold text-[var(--color-primary)]">
                       {menu.name}
                     </span>
-                    <span className="text-xs text-[var(--color-gray-2)] mt-1">
-                      카테고리: {menu.category} | 후보 리뷰어: {commentCount}명
+                    <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-semibold text-[var(--color-secondary)]">
+                      {commentCount}
                     </span>
                   </div>
                 </button>
@@ -298,9 +328,9 @@ export default function OwnerRegisteredMenuPage() {
           >
             {submenuItems.map((menu) => {
               const isActive = selectedSubmenu?.id === menu.id;
-              const price = menu.raw?.menuPrice || '';
-              const category = menu.raw?.category || '';
-              const discount = menu.raw?.discount || '';
+              const price = menu.raw?.menuPrice || "";
+              const category = menu.raw?.category || "";
+              const discount = menu.raw?.discount || "";
               return (
                 <button
                   key={menu.id}
@@ -308,7 +338,6 @@ export default function OwnerRegisteredMenuPage() {
                   className={`flex h-[75px] w-[345px] items-center gap-4 rounded-[10px] px-4 text-left shadow-[0_8px_20px_rgba(0,0,0,0.05)] ${
                     isActive ? "bg-[var(--color-secondary)]" : "bg-white"
                   }`}
-                  onClick={() => setSelectedSubmenu(menu)}
                 >
                   <div
                     className="h-[44px] w-[44px] rounded-[10px]"
@@ -319,7 +348,8 @@ export default function OwnerRegisteredMenuPage() {
                       {menu.name}
                     </span>
                     <span className="text-xs text-[var(--color-gray-2)] mt-1">
-                      가격: {price ? `${price}원` : '-'} | 카테고리: {category || '-'} | 할인: {discount || '-'}
+                      가격: {price ? `${price}원` : "-"} | 카테고리:{" "}
+                      {category || "-"} | 할인: {discount || "-"}
                     </span>
                   </div>
                 </button>
@@ -333,86 +363,6 @@ export default function OwnerRegisteredMenuPage() {
             >
               +
             </button>
-
-            {selectedSubmenu && (
-              <div className="flex w-full flex-col items-center gap-[12px] animate-[fadeIn_0.4s_ease-out]">
-                <div className="self-start">
-                  <h2 className="text-xl font-semibold text-[var(--color-primary)]">
-                    {selectedSubmenu.name} 테스트 후보
-                  </h2>
-                </div>
-
-                {(commentsMap[selectedSubmenu.name] ?? []).length === 0 && (
-                  <p className="text-sm text-[var(--color-gray-2)]">
-                    아직 코멘트가 없어요.
-                  </p>
-                )}
-                {commentsMap[selectedSubmenu.name]?.map((comment, index) => (
-                  <RequestCardLarge
-                    key={comment.id}
-                    className="animate-[slideIn_0.4s_ease-out] opacity-0"
-                    style={
-                      {
-                        animationDelay: `${index * 0.1}s`,
-                        animationFillMode: "forwards",
-                      } as React.CSSProperties
-                    }
-                    title={comment.nickname}
-                    subtitle={`리뷰온도 ${comment.temperature.toFixed(1)} ℃`}
-                    thumbnailColor={comment.thumbnail}
-                    showRatingIcon={false}
-                    onCardClick={() => setModalComment(comment)}
-                    onClose={() =>
-                      setCommentsMap((prev) => ({
-                        ...prev,
-                        [selectedSubmenu.name]: (
-                          prev[selectedSubmenu.name] ?? []
-                        ).filter((item) => item.id !== comment.id),
-                      }))
-                    }
-                    leftAction={{
-                      label: "삭제하기",
-                      variant: "secondary",
-                      onClick: (event) => {
-                        event.stopPropagation();
-                        setCommentsMap((prev) => ({
-                          ...prev,
-                          [selectedSubmenu.name]: (
-                            prev[selectedSubmenu.name] ?? []
-                          ).filter((item) => item.id !== comment.id),
-                        }));
-                      },
-                    }}
-                    rightAction={{
-                      label: "요청보내기",
-                      onClick: (event) => {
-                        event.stopPropagation();
-
-                        // owner 정보 가져오기
-                        const ownerProfile = getOwnerProfile();
-                        if (ownerProfile && selectedSubmenu) {
-                          // gourmet에게 요청 보내기
-                          sendRequestToGourmet(
-                            comment.nickname,
-                            selectedSubmenu.name,
-                            {
-                              name: ownerProfile.nickname || "음식점",
-                              rating: 4.9,
-                              reviewCount: 343,
-                              distance: "1.7km",
-                            }
-                          );
-
-                          alert(`${comment.nickname}님에게 요청을 보냈습니다!`);
-                        } else {
-                          alert("요청을 보내려면 owner 프로필이 필요합니다.");
-                        }
-                      },
-                    }}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         )}
       </main>

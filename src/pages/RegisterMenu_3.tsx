@@ -1,11 +1,24 @@
 // src/registerMenu_3.tsx
-import { useState, useRef, type ChangeEvent, useEffect } from "react"; 
-import Button from "../components/Button.tsx"; 
-import TopNavigator from "../components/TopNavigator.tsx"; 
+import { useState, useRef, type ChangeEvent, useEffect } from "react";
+import Button from "../components/Button.tsx";
+import TopNavigator from "../components/TopNavigator.tsx";
 import { createRoot } from "react-dom/client";
-//import TabBar from "./components/TabBar"; 
-import { colors } from "../constants/colors.ts"; 
-import { getMenuData, saveMenuData, validateStep3, clearMenuData, addMenuToList, type MenuRegistrationData } from "../utils/menuDataManager.ts";
+//import TabBar from "./components/TabBar";
+import { colors } from "../constants/colors.ts";
+import {
+  getMenuData,
+  saveMenuData,
+  validateStep3,
+  clearMenuData,
+  addMenuToList,
+  type MenuRegistrationData,
+} from "../utils/menuDataManager.ts";
+import {
+  getFoodItems,
+  setFoodItems,
+  getOwnerMenus,
+  setOwnerMenus,
+} from "../utils/localStorage.ts";
 
 export default function RegisterMenu_3() {
   // 1. 이미지 미리보기 URL을 저장할 state
@@ -17,9 +30,22 @@ export default function RegisterMenu_3() {
   // 2. 숨겨진 file input에 접근하기 위한 ref
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Helper function for random color
+  const getRandomColor = () => {
+    const colors = [
+      "#ffe3d5",
+      "#e6f6ff",
+      "#f5e6ff",
+      "#ffe1e0",
+      "#ffecc1",
+      "#cdf2ff",
+      "#e4f7e4",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
   // Load existing data on mount
   useEffect(() => {
-
     const savedData = getMenuData();
     setImagePreview(savedData.imagePreview);
     setCategory(savedData.category);
@@ -65,21 +91,21 @@ export default function RegisterMenu_3() {
     }
   };
   const handleBack = async () => {
-      try {
-        const mod = await import("./registerMenu_2");
-        const Page = mod && mod.default ? mod.default : null;
-        const root = document.getElementById("root");
-        if (root && Page) {
-          createRoot(root).render(<Page />);
-        } else {
-          // fallback to history back if dynamic load fails
-          window.history.back();
-        }
-      } catch (e) {
-        console.error("Failed to navigate to registerMenu_2:", e);
+    try {
+      const mod = await import("./registerMenu_2");
+      const Page = mod && mod.default ? mod.default : null;
+      const root = document.getElementById("root");
+      if (root && Page) {
+        createRoot(root).render(<Page />);
+      } else {
+        // fallback to history back if dynamic load fails
         window.history.back();
       }
-    };
+    } catch (e) {
+      console.error("Failed to navigate to registerMenu_2:", e);
+      window.history.back();
+    }
+  };
 
   const handleComplete = async () => {
     // Validate step 3 data
@@ -87,7 +113,6 @@ export default function RegisterMenu_3() {
     if (!validation.valid) {
       setValidationError(validation.error);
       return;
-    
     }
 
     setIsSubmitting(true);
@@ -95,7 +120,7 @@ export default function RegisterMenu_3() {
       // Build an explicit final payload (don't rely on getMenuData to carry
       // transient image data). This ensures menuName and imagePreview are
       // present in the payload we send to the server, download, and store.
- ;    const persisted = getMenuData();
+      const persisted = getMenuData();
       const finalPayload: MenuRegistrationData = {
         location: persisted.location ?? null,
         menuName: persisted.menuName ?? "",
@@ -108,6 +133,7 @@ export default function RegisterMenu_3() {
         category: category ?? "",
       };
 
+      console.log("Final payload to be saved:", finalPayload);
       // Save non-image fields to localStorage
       saveMenuData(finalPayload);
 
@@ -116,6 +142,31 @@ export default function RegisterMenu_3() {
       // data is stored in the browser's localStorage under the menus list key.
       try {
         addMenuToList(finalPayload);
+
+        // Also save to FOOD_ITEMS for food list
+        const currentFoodItems = getFoodItems();
+        const newFoodItem = {
+          id: String(Date.now()),
+          name: finalPayload.menuName || "unknown",
+          category: finalPayload.category || "",
+          price: finalPayload.menuPrice || "",
+          discount: finalPayload.discount || "",
+          description: finalPayload.description || "",
+          image: finalPayload.imagePreview || "",
+          location: finalPayload.location,
+          createdAt: new Date().toISOString(),
+        };
+        setFoodItems([...currentFoodItems, newFoodItem]);
+
+        // Also save to OWNER_MENUS
+        const currentOwnerMenus = getOwnerMenus();
+        const newOwnerMenu = {
+          id: `menu-${Date.now()}`,
+          name: finalPayload.menuName || "unknown",
+          thumbnail: finalPayload.imagePreview || getRandomColor(),
+          count: 0,
+        };
+        setOwnerMenus([...currentOwnerMenus, newOwnerMenu]);
       } catch (err) {
         console.warn("Failed to append menu to local list:", err);
       }
@@ -136,7 +187,10 @@ export default function RegisterMenu_3() {
           return;
         }
       } catch (e) {
-        console.warn("Could not dynamically load OwnerRegisteredMenuPage, falling back to home:", e);
+        console.warn(
+          "Could not dynamically load OwnerRegisteredMenuPage, falling back to home:",
+          e
+        );
       }
       // fallback
       window.location.href = "/";
@@ -154,8 +208,8 @@ export default function RegisterMenu_3() {
       {/* 2. 프로그레스 바 */}
       <div className="w-full px-4 py-3">
         <div className="flex h-1.5 w-full rounded-full bg-gray-200">
-          <div 
-            className="h-1.5 rounded-full bg-black transition-all duration-1000 ease-out" 
+          <div
+            className="h-1.5 rounded-full bg-black transition-all duration-1000 ease-out"
             style={{ width: `${currentProgress}%` }}
           ></div>
         </div>
@@ -166,7 +220,9 @@ export default function RegisterMenu_3() {
         {/* Error message display */}
         {validationError && (
           <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
-            <p className="text-sm font-medium text-red-800">{validationError}</p>
+            <p className="text-sm font-medium text-red-800">
+              {validationError}
+            </p>
           </div>
         )}
 
@@ -174,7 +230,7 @@ export default function RegisterMenu_3() {
         <form className="relative mb-4 w-full">
           <div>
             <label
-              htmlFor="imageUpload" 
+              htmlFor="imageUpload"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               이미지 등록
@@ -194,27 +250,27 @@ export default function RegisterMenu_3() {
             <input
               id="imageUpload"
               type="file"
-              ref={fileInputRef} 
-              onChange={handleImageChange} 
-              className="hidden" 
-              accept="image/*" 
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              className="hidden"
+              accept="image/*"
             />
             <div className="w-full">
-            <button
-              type="button" 
-              onClick={handleUploadButtonClick}
-              className="w-1/2 mt-2  rounded-lg border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500"
-            >
-              파일 선택
-            </button>
-            <button
-              type="button" 
-              onClick={handleDeleteButtonClick}
-              className="w-1/2 mt-2 rounded-lg border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500"
-            >
-              삭제하기
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={handleUploadButtonClick}
+                className="w-1/2 mt-2  rounded-lg border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500"
+              >
+                파일 선택
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteButtonClick}
+                className="w-1/2 mt-2 rounded-lg border border-gray-300 py-2 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-500"
+              >
+                삭제하기
+              </button>
+            </div>
           </div>
 
           <div className="flex space-x-2 padding-top-3 mt-4 mb-2">
