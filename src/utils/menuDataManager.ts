@@ -32,7 +32,7 @@ export interface MenuRegistrationData {
   description: string;
   imagePreview: string | null;
   imageFile: File | null;
-  quantity: string;
+  category: string;
 }
 
 const STORAGE_KEY = "menuRegistrationData";
@@ -91,7 +91,7 @@ export const getEmptyMenuData = (): MenuRegistrationData => ({
   description: "",
   imagePreview: null,
   imageFile: null,
-  quantity: "",
+  category: "",
 });
 
 /**
@@ -124,7 +124,7 @@ export const saveMenuData = (data: MenuRegistrationData): void => {
       discount: data.discount ?? existing.discount ?? "무료",
       description: data.description ?? existing.description ?? "",
       imagePreview: data.imagePreview ?? existing.imagePreview ?? null,
-      quantity: data.quantity ?? existing.quantity ?? "",
+      category: data.category ?? existing.category ?? "",
     };
 
     storage.setJson(STORAGE_KEY, dataToStore);
@@ -183,20 +183,17 @@ export const validateStep2 = (
 };
 
 /**
- * Validate Step 3 (Image & Quantity)
+ * Validate Step 3 (Image & Category)
  */
 export const validateStep3 = (
   imagePreview: string | null,
-  quantity: string
+  category: string
 ): { valid: boolean; error: string | null } => {
   if (!imagePreview) {
     return { valid: false, error: "이미지를 업로드해주세요." };
   }
-  if (!quantity || !quantity.trim()) {
-    return { valid: false, error: "수량을 입력해주세요." };
-  }
-  if (isNaN(Number(quantity)) || Number(quantity) <= 0) {
-    return { valid: false, error: "유효한 수량을 입력해주세요." };
+  if (!category || !category.trim()) {
+    return { valid: false, error: "카테고리를 입력해주세요." };
   }
   return { valid: true, error: null };
 };
@@ -206,7 +203,7 @@ export type StoredMenuListItem = {
   id: string;
   name: string;
   thumbnail?: string; // data URL or color placeholder
-  count?: number; // quantity
+  category?: string; // category
   createdAt?: string;
   raw?: Partial<MenuRegistrationData>;
 };
@@ -220,9 +217,9 @@ export const getMenusList = (): StoredMenuListItem[] => {
     const parsed = storage.getJson<StoredMenuListItem[]>(MENUS_LIST_KEY);
     if (!parsed) return [];
     if (Array.isArray(parsed)) {
-      // Filter: only return items with valid name and count
+      // Filter: only return items with valid name and category
       return parsed.filter(item => 
-        item.name && item.name.trim() && item.count && item.count > 0
+        item.name && item.name.trim() && item.category && item.category.trim()
       );
     }
   } catch (err) {
@@ -248,13 +245,13 @@ export const addMenuToList = (data: MenuRegistrationData): StoredMenuListItem =>
     if (data.menuPrice && data.menuPrice.trim()) filteredRaw.menuPrice = data.menuPrice;
     if (data.discount && data.discount.trim()) filteredRaw.discount = data.discount;
     if (data.description && data.description.trim()) filteredRaw.description = data.description;
-    if (data.quantity && data.quantity.trim()) filteredRaw.quantity = data.quantity;
+    if (data.category && data.category.trim()) filteredRaw.category = data.category;
     
     const item: StoredMenuListItem = {
       id: String(now),
       name: data.menuName || "무명 메뉴",
       thumbnail: data.imagePreview || undefined,
-      count: Number(data.quantity) || 0,
+      category: data.category || "",
       createdAt: new Date(now).toISOString(),
       raw: filteredRaw,
     };

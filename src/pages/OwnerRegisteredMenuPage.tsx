@@ -17,7 +17,7 @@ type MenuItem = {
   id: string;
   name: string;
   thumbnail: string;
-  count: number;
+  category: string;
 };
 
 type CommentItem = {
@@ -197,12 +197,12 @@ export default function OwnerRegisteredMenuPage() {
                     className="h-[44px] w-[44px] rounded-[10px]"
                     style={{ backgroundColor: menu.thumbnail }}
                   />
-                  <div className="flex flex-1 items-center justify-between">
+                  <div className="flex flex-1 flex-col items-start justify-center">
                     <span className="text-base font-semibold text-[var(--color-primary)]">
                       {menu.name}
                     </span>
-                    <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-semibold text-[var(--color-secondary)]">
-                      {commentCount}
+                    <span className="text-xs text-[var(--color-gray-2)] mt-1">
+                      카테고리: {menu.category} | 후보 리뷰어: {commentCount}명
                     </span>
                   </div>
                 </button>
@@ -297,8 +297,10 @@ export default function OwnerRegisteredMenuPage() {
             }`}
           >
             {submenuItems.map((menu) => {
-              const commentCount = commentsMap[menu.name]?.length ?? 0;
               const isActive = selectedSubmenu?.id === menu.id;
+              const price = menu.raw?.menuPrice || '';
+              const category = menu.raw?.category || '';
+              const discount = menu.raw?.discount || '';
               return (
                 <button
                   key={menu.id}
@@ -312,12 +314,12 @@ export default function OwnerRegisteredMenuPage() {
                     className="h-[44px] w-[44px] rounded-[10px]"
                     style={{ backgroundColor: menu.thumbnail || "#ffecc1" }}
                   />
-                  <div className="flex flex-1 items-center justify-between">
+                  <div className="flex flex-1 flex-col items-start justify-center">
                     <span className="text-base font-semibold text-[var(--color-primary)]">
                       {menu.name}
                     </span>
-                    <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-sm font-semibold text-[var(--color-secondary)]">
-                      {commentCount}
+                    <span className="text-xs text-[var(--color-gray-2)] mt-1">
+                      가격: {price ? `${price}원` : '-'} | 카테고리: {category || '-'} | 할인: {discount || '-'}
                     </span>
                   </div>
                 </button>

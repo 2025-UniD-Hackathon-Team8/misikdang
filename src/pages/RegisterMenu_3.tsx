@@ -10,7 +10,7 @@ import { getMenuData, saveMenuData, validateStep3, clearMenuData, addMenuToList,
 export default function RegisterMenu_3() {
   // 1. 이미지 미리보기 URL을 저장할 state
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -22,7 +22,7 @@ export default function RegisterMenu_3() {
 
     const savedData = getMenuData();
     setImagePreview(savedData.imagePreview);
-    setQuantity(savedData.quantity);
+    setCategory(savedData.category);
   }, []);
 
   // Progress bar animation
@@ -83,7 +83,7 @@ export default function RegisterMenu_3() {
 
   const handleComplete = async () => {
     // Validate step 3 data
-    const validation = validateStep3(imagePreview, quantity);
+    const validation = validateStep3(imagePreview, category);
     if (!validation.valid) {
       setValidationError(validation.error);
       return;
@@ -105,7 +105,7 @@ export default function RegisterMenu_3() {
         // include the in-memory image preview (data URL)
         imagePreview: imagePreview ?? null,
         imageFile: null,
-        quantity: quantity ?? "",
+        category: category ?? "",
       };
 
       // Save non-image fields to localStorage
@@ -218,21 +218,21 @@ export default function RegisterMenu_3() {
           </div>
 
           <div className="flex space-x-2 padding-top-3 mt-4 mb-2">
-            {/* 수량 설정 */}
+            {/* 카테고리 설정 */}
             <div className="w-2/3">
               <label
-                htmlFor="menuQuantity"
+                htmlFor="menuCategory"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                수량
+                카테고리
               </label>
               <div className="relative">
                 <input
-                  id="menuQuantity"
+                  id="menuCategory"
                   type="text"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  placeholder="예) 10"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="예) 햄버거"
                   className="w-full rounded-lg border border-gray-300 py-3 pl-4 pr-10 text-base focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
                 />
               </div>
