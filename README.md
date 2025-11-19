@@ -1,6 +1,6 @@
 # 🍽️ 미식당 (美食堂)
 
-<img src="public/slides/slide1.png" width="400px"/>
+<img src="public/slides/slide1.png" width="500px"/>
 
 > 당신에게 딱 맞는 음식 테스터 찾기 서비스 (2025 Uni-dthon 참가작)
 
@@ -23,10 +23,8 @@
 <p>
     <img src="public/slides/slide7.png" width="250"/>
     <img src="public/slides/slide8.png" width="250"/>
-</p>
-<p>
     <img src="public/slides/slide9.png" width="250"/>
-    <img src="public/slides/slide10.png" width="250"/>
+</p>
 
 #### 🔍 미식가(소비자) 모드
 
