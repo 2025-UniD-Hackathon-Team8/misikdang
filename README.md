@@ -40,7 +40,7 @@
 
 #### 🎬 시연 영상
 
-<video src="public/demo.mp4" width="500" controls></video>
+<video src="public/demo.mp4"  width="500" controls></video>
 
 ## 🛠 기술 스택
 
@@ -74,7 +74,7 @@ Create `.env` file in the project root and set your Google Maps API key:
 VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
 ```
 
-### Run the Server
+### Run Server
 
 ```bash
 # Start development server (http://localhost:5173)
